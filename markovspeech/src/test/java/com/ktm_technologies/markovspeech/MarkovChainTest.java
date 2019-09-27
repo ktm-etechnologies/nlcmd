@@ -16,7 +16,10 @@
 
 package com.ktm_technologies.markovspeech;
 
+
+
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -31,6 +34,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
+
 public class MarkovChainTest {
 
     private final static int _WINDOW = 1;

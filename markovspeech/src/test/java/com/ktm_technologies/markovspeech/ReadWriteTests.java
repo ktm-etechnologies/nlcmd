@@ -17,7 +17,10 @@
 package com.ktm_technologies.markovspeech;
 
 
+
+
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,6 +36,7 @@ import static org.junit.Assert.assertEquals;
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
+
 public class ReadWriteTests {
 
     @Test
