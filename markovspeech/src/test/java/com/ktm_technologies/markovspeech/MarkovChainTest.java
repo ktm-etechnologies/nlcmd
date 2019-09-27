@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-package com.ktm_technologies.markovtest;
-
-import com.ktm_technologies.markovspeech.MarkovChain;
-import com.ktm_technologies.markovspeech.MatchResults;
+package com.ktm_technologies.markovspeech;
 
 import org.junit.Test;
 
