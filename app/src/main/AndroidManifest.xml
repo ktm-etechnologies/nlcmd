@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.ktm_technologies.markovtest">
+    package="com.ktm_technologies.markovapp">
 
     <application
         android:allowBackup="true"
