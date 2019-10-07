@@ -24,42 +24,62 @@ import java.util.List;
  */
 public class MatchResults {
 
-    /**
-     * Represents a match found against the markov chain.
-     */
-    public class Entry {
+    abstract class Match {
 
-        private final List<String>    _matchPhrase;
-        private final int             _offset;
-        private final double          _avgProbability;
+        private final int       _offset;
+        private List<String>    _matchPhrase = new LinkedList<>();
 
-        /**
-         * Create Entry object
-         * @param matchPhrase Part of phrase that matched
-         * @param offset Offset of matchPhrase in full query phrase
-         * @param avgProbability Averaged probability of edges in matchPhrase
-         */
-        Entry(List<String>  matchPhrase,
-              int           offset,
-              double        avgProbability) {
+        Match(int offset) {
 
-            _matchPhrase = matchPhrase;
             _offset = offset;
-            _avgProbability = avgProbability;
         }
 
         /**
          * @return Part of phrase that matched
          */
-        public List<String> getMatchPhrase() {
-            return _matchPhrase;
-        }
+        List<String> getPhrase() { return _matchPhrase; }
+
+        /**
+         *
+         * @param phrase
+         */
+        protected void setPhrase(List<String> phrase) { _matchPhrase = phrase; }
 
         /**
          * @return Offset of subPhrase in full query phrase
          */
-        public int getOffset() {
-            return _offset;
+        int getOffset() { return _offset; }
+
+        void append(String word) {
+            _matchPhrase.add(word);
+        }
+    }
+
+    /**
+     * Represents a match found against the markov chain.
+     */
+    public class Phrase extends Match {
+
+        private final double            _avgProbability;
+        private final Placeholder       _placeholder;
+
+        /**
+         * Create Phrase object
+         * @param matchPhrase Part of phrase that matched
+         * @param offset Offset of matchPhrase in full query phrase
+         * @param avgProbability Averaged probability of edges in matchPhrase
+         * @param placeholder Phrase matched by placeholder or null
+         */
+        Phrase(List<String>     matchPhrase,
+               int              offset,
+               double           avgProbability,
+               Placeholder      placeholder) {
+
+            super(offset);
+
+            _avgProbability = avgProbability;
+            _placeholder = placeholder;
+            this.setPhrase(matchPhrase);
         }
 
         /**
@@ -68,9 +88,40 @@ public class MatchResults {
         public double getAvgProbability() {
             return _avgProbability;
         }
+
+        /**
+         * @return Placeholder match or null
+         */
+        public Placeholder getPlaceholder() { return _placeholder; }
     }
 
-    private final LinkedList<Entry> _entries = new LinkedList<>();
+    public class Placeholder extends Match {
+
+        private final String        _keyword;
+        private final int           _offset;
+
+        Placeholder(String  keyword,
+                    int     offset) {
+
+            super(offset);
+
+            _keyword = keyword;
+            _offset = offset;
+        }
+
+        void append(String word) {
+            super.append(word);
+        }
+
+        /**
+         * @return Part of phrase that matched
+         */
+        public String getToken() {
+            return _keyword;
+        }
+    }
+
+    private final LinkedList<Phrase> _entries = new LinkedList<>();
 
     /**
      * Container object for matches
@@ -82,18 +133,22 @@ public class MatchResults {
      * @param matchPhrase Part of phrase that matched
      * @param offset Offset of matchPhrase in full query phrase
      * @param avgProbability Averaged probability of edges in matchPhrase
+     * @param placeholder Phrase matched by placeholder or null
      */
-    void append(List<String> matchPhrase,
-                int          offset,
-                double       avgProbability) {
+    void append(List<String>    matchPhrase,
+                int             offset,
+                double          avgProbability,
+                Placeholder     placeholder) {
 
-        _entries.add(new Entry(matchPhrase, offset, avgProbability));
+        _entries.add(new Phrase(matchPhrase, offset, avgProbability, placeholder));
     }
 
     /**
      * @return List of match entries
      */
-    public LinkedList<Entry> getEntries() {
+    public LinkedList<Phrase> getEntries() {
         return _entries;
     }
+
+    Placeholder createPlaceholder(String keyword, int offset) { return new Placeholder(keyword, offset); }
 }
