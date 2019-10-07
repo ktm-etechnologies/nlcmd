@@ -234,6 +234,36 @@ class Node {
     }
 }
 
+class PlaceholderNode extends Node {
+
+    private final Node _parent;
+
+    PlaceholderNode(Node node) {
+        super(node.getLabel());
+        _parent = node;
+    }
+
+    @Override
+    Label getLabel() {
+        return _parent.getLabel();
+    }
+
+    @Override
+    HashMap<Label, Edge> getEdges() {
+        return _parent.getEdges();
+    }
+
+    @Override
+    void addEdge(Edge edge) {
+        _parent.addEdge(edge);
+    }
+
+    @Override
+    void addEdge(Node node) {
+        _parent.addEdge(node);
+    }
+}
+
 /**
  * Represents a sliding window over a phrase.
  */
@@ -241,6 +271,7 @@ class SlidingWindow {
 
     private final List<String>  _phrase;
     private final int           _size;
+    private boolean             _isPlaceholder = false;
 
     /**
      * Create SlidingWindow object.
@@ -252,6 +283,16 @@ class SlidingWindow {
         _phrase = new LinkedList<>(phrase);
         _size = size;
     }
+
+    /**
+     * @return TRUE if visited placeholder label and not yet reset back to normal mode
+     */
+    boolean isPlaceholder() { return _isPlaceholder; }
+
+    /**
+     * Reset after normal matching has been resumed.
+     */
+    void resetPlaceholder() { _isPlaceholder = false; }
 
     /**
      * @return true if the window can slide further
@@ -273,10 +314,28 @@ class SlidingWindow {
         String[] fragments = new String[_size];
         for (int i = 0; i < _size; i++) {
             fragments[i] = _phrase.get(i);
+            if (isPlaceholder(fragments[i])) {
+                _isPlaceholder = true;
+            }
         }
+
         _phrase.remove(0);
 
         return new Label(fragments);
+    }
+
+    /**
+     * @param word
+     * @return TRUE if #word is a keyword, otherwise FALSE
+     */
+    static boolean isPlaceholder(String word) {
+
+        if (word.startsWith("<") &&
+            word.endsWith(">")) {
+            return true;
+        }
+
+        return false;
     }
 }
 
@@ -415,13 +474,67 @@ public class MarkovChain {
         // Strict match, entire phrase needs to be in model.
         if (details.getEntries().size() != 1 ||
             details.getEntries().getFirst().getOffset() != 0 ||
-            details.getEntries().getFirst().getMatchPhrase().size() != phrase.size()) {
+            details.getEntries().getFirst().getPhrase().size() != phrase.size()) {
 
             return 0.0;
         }
 
         return avgProbability;
     }
+
+    /**
+     * Check if {@code node} has an outgoing label {@code label} taking placeholders into account.
+     * @param node Current node
+     * @param label Outgoing label to look for
+     * @return {@code true} if {@code label} can be matched
+     */
+    /*
+    private boolean _matchPlaceholder(Node  node,
+                                      Label label,
+                                      boolean firstMatch) {
+
+    //        There are 4 cases to cover:
+    //        Label: foo bar baz      # input phrase
+    //     Node:  1. foo bar baz      # literal match ... covered outside this function
+    //            2. foo bar <x>      # placeholder end of node ......... if firstMatch == true
+    //            3. foo <x> baz      # placeholder middle of node ...... not considered at the moment
+    //            4. <x> bar baz      # placeholder beginning of node ... if firstMatch == false
+    //                                # will fall back to 2. if fails
+
+        TODO
+
+        boolean match = false;
+        for (Edge edge : node.getEdges().values()) {
+
+            String[] frags1 = edge.getNode().getLabel().getFragments();
+            String[] frags2 = label.getFragments();
+            match = false;
+            int i;
+            for (i = 0; i < frags2.length; i++) {
+
+                // Placeholder matches everything
+                if (SlidingWindow.isPlaceholder(frags1[i])) {
+                    match = true;
+                    break;
+                }
+
+                if (!frags1[i].equals(frags2[i])) {
+                    break;
+                }
+            }
+
+            if (i > frags2.length) {
+                match = true;
+            }
+
+            if (match) {
+                break;
+            }
+        }
+
+        return match;
+    }
+*/
 
     /**
      * Scan #phrase for single match against model.
@@ -463,6 +576,7 @@ public class MarkovChain {
 
         // Match chain
         int nEdges = 0;
+        MatchResults.Placeholder placeholder = null;
         while (sw.canSlide()) {
 
             Label label = sw.slide();
@@ -471,17 +585,40 @@ public class MarkovChain {
                 nEdges++;
                 sumProbabilities += edge.getProbability();
                 node = edge.getNode();
-            } else if (false /*TODO match placeholders */) {
+                // Found a match, so reset eventual placeholder scanning
+                // and store away placeholder details
+                if (placeholder != null) {
+                    sw.resetPlaceholder();
+                    placeholder = null;
+                }
+            } else if (false /*_matchPlaceholder(node, label)*/) {
 
+                String word = label.getFragments()[label.getFragments().length - 1];
+                if (placeholder == null) {
+                    // Starting to match against placeholder
+                    placeholder = details.createPlaceholder(word, offset + nEdges);
+                    // Phrase eaten up by placeholder always gets probability 1
+                    nEdges++;
+                    sumProbabilities += 1;
+                } else {
+                    // Accumulate placeholder phrase
+                    placeholder.append(word);
+                }
             } else {
                 break;
             }
         }
 
+        // Found a match, so reset eventual placeholder scanning
+        // and store away placeholder details
+        if (placeholder != null) {
+            sw.resetPlaceholder();
+        }
+
         // Capture details
         double avgProbability = sumProbabilities / nEdges;
         List<String> subPhrase = phrase.subList(offset, offset + nEdges + _window);
-        details.append(subPhrase, phraseOffset + offset, avgProbability);
+        details.append(subPhrase, phraseOffset + offset, avgProbability, placeholder);
 
         return avgProbability;
     }
@@ -518,8 +655,8 @@ public class MarkovChain {
         do {
             avgProbability = _scanSingleMatch(subPhrase, offset, details);
             if (avgProbability > 0.0) {
-                MatchResults.Entry entry = details.getEntries().getLast();
-                offset = entry.getOffset() + entry.getMatchPhrase().size();
+                MatchResults.Phrase entry = (MatchResults.Phrase) /* TODO */ details.getEntries().getLast();
+                offset = entry.getOffset() + entry.getPhrase().size();
                 subPhrase = phrase.subList(offset, phrase.size());
             }
             if (avgProbability > avgProbabilityMax) {
