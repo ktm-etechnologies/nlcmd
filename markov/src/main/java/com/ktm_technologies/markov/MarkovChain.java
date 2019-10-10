@@ -393,6 +393,40 @@ class SlidingWindow {
     }
 }
 
+/**
+ * Interface used to walk a markov chain.
+ */
+
+interface Stream {
+
+    /**
+     * Invoked when starting to iterate the model.
+     * @param window Window size
+     */
+    void startModel(int window);
+
+    /**
+     * Invoked when iteration of the model is finished.
+     */
+    void endModel();
+
+    /**
+     * Invoked when starting to iterate a graph inside the model.
+     */
+    void startGraph(String[] labelFragments);
+
+    /**
+     * Invoked when iteration of the current graph is finished.
+     */
+    void endGraph();
+
+    /**
+     * Invoked when visiting an edge in the current graph.
+     */
+    void addEdge(double probability,
+                 String[] labelFragments);
+}
+
 class Config {
 
     final static Charset CHARSET = Charset.forName("UTF-8");
@@ -645,7 +679,7 @@ public class MarkovChain {
      * Walk the entire markov chain.
      * @param listener Data readout interface
      */
-    public void traverse(TraverseInterface listener) {
+    public void traverse(Stream listener) {
 
         // Visit all nodes
         listener.startModel(_window);
