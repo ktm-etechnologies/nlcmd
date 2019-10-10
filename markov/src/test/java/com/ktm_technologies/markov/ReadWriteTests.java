@@ -16,9 +16,6 @@
 
 package com.ktm_technologies.markov;
 
-
-
-
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -39,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 public class ReadWriteTests {
 
     @Test
-    public void writeFooBarBazDot() {
+    public void writeFooBarBazDot() throws Exception {
 
         MarkovChain mc = MarkovChainTest.createFooBarBazChain();
         DotWriter writer = new DotWriter("FooBarBaz", new PrintStream(System.out));
@@ -47,7 +44,7 @@ public class ReadWriteTests {
     }
 
     @Test
-    public void writeDiamondDot() {
+    public void writeDiamondDot() throws Exception {
 
         MarkovChain mc = MarkovChainTest.createDiamondChain();
         DotWriter writer = new DotWriter("Diamond", new PrintStream(System.out));
@@ -55,7 +52,7 @@ public class ReadWriteTests {
     }
 
     @Test
-    public void writeFoxDotW1() {
+    public void writeFoxDotW1() throws Exception {
 
         MarkovChain mc = MarkovChainTest.createFoxChainW1();
         DotWriter writer = new DotWriter("Diamond", new PrintStream(System.out));
@@ -63,7 +60,7 @@ public class ReadWriteTests {
     }
 
     @Test
-    public void writeFoxDotW2() {
+    public void writeFoxDotW2() throws Exception {
 
         MarkovChain mc = MarkovChainTest.createFoxChainW2();
         DotWriter writer = new DotWriter("Diamond", new PrintStream(System.out));
@@ -71,7 +68,7 @@ public class ReadWriteTests {
     }
 
     @Test
-    public void writeFishDotW1() {
+    public void writeFishDotW1() throws Exception {
 
         MarkovChain mc = MarkovChainTest.createFishChainW1();
         DotWriter writer = new DotWriter("Fish", new PrintStream(System.out));
@@ -79,7 +76,7 @@ public class ReadWriteTests {
     }
 
     @Test
-    public void writeFishDotW2() {
+    public void writeFishDotW2() throws Exception {
 
         MarkovChain mc = MarkovChainTest.createFishChainW2();
         DotWriter writer = new DotWriter("Fish", new PrintStream(System.out));
@@ -87,7 +84,7 @@ public class ReadWriteTests {
     }
 
     @Test
-    public void writeFooBarBazJson() {
+    public void writeFooBarBazJson() throws Exception {
 
         MarkovChain mc = MarkovChainTest.createFooBarBazChain();
         JsonWriter writer = new JsonWriter("FooBarBaz", new PrintStream(System.out));
@@ -95,7 +92,7 @@ public class ReadWriteTests {
     }
 
     @Test
-    public void writeFishJsonW1() {
+    public void writeFishJsonW1() throws Exception {
 
         MarkovChain mc = MarkovChainTest.createFishChainW1();
         JsonWriter writer = new JsonWriter("Fish", new PrintStream(System.out));
@@ -103,7 +100,7 @@ public class ReadWriteTests {
     }
 
     @Test
-    public void roundtripJsonW1() {
+    public void roundtripJsonW1() throws Exception {
 
         MarkovChain mc1 = MarkovChainTest.createFoxChainW1();
         List<String> phrase = new LinkedList<>(Arrays.asList("over", "the", "lazy", "dog"));
@@ -116,13 +113,14 @@ public class ReadWriteTests {
 
         ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
         MarkovChain mc2 = JsonReader.read(in);
+        assert mc2 != null;
         MatchResults match = new MatchResults();
         double result2 = mc2.scan(phrase, match);
         assertEquals(result1, result2, 0.0001);
     }
 
     @Test
-    public void roundtripJsonW2() {
+    public void roundtripJsonW2() throws Exception {
 
         MarkovChain mc1 = MarkovChainTest.createFoxChainW2();
         List<String> phrase = new LinkedList<>(Arrays.asList("over", "the", "lazy", "dog"));
@@ -135,6 +133,7 @@ public class ReadWriteTests {
 
         ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
         MarkovChain mc2 = JsonReader.read(in);
+        assert mc2 != null;
         MatchResults match = new MatchResults();
         double result2 = mc2.scan(phrase, match);
         assertEquals(result1, result2, 0.0001);

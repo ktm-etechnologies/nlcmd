@@ -47,25 +47,17 @@ public class JsonWriter implements Stream {
     }
 
     @Override
-    public void startModel(int window) {
+    public void startModel(int window) throws Exception {
 
-        try {
-            _json.put(Config.JSON_LABEL, _name);
-            _json.put(Config.JSON_WINDOW, window);
-        } catch (JSONException e) {
-            // TODO error handling
-        }
+        _json.put(Config.JSON_LABEL, _name);
+        _json.put(Config.JSON_WINDOW, window);
     }
 
     @Override
-    public void endModel() {
+    public void endModel() throws Exception {
 
-        try {
-            _edges = null;
-            _out.write(_json.toString(2).getBytes(Config.CHARSET));
-        } catch (Exception e) {
-            // TODO error handling
-        }
+        _edges = null;
+        _out.write(_json.toString(2).getBytes(Config.CHARSET));
     }
 
     @Override

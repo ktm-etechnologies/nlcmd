@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Represents a node label
@@ -192,7 +193,7 @@ class ReflexiveEdge extends Edge {
 class Node {
 
     private final HashMap<Label, Edge>  _edges = new HashMap<>();
-    private Label                       _label;
+    private final Label                 _label;
 
     /**
      * Create Node object.
@@ -397,6 +398,7 @@ class SlidingWindow {
      * @param token Input word
      * @return {@code true} if {@code token} is a keyword
      */
+    @SuppressWarnings("RedundantIfStatement")
     static boolean isPlaceholder(String token) {
 
         if (token.startsWith("<") &&
@@ -418,31 +420,35 @@ interface Stream {
      * Invoked when starting to iterate the model.
      * @param window Window size
      */
-    void startModel(int window);
+    void startModel(int window) throws Exception;
 
     /**
      * Invoked when iteration of the model is finished.
      */
-    void endModel();
+    void endModel() throws Exception;
 
     /**
      * Invoked when starting to iterate a graph inside the model.
      * @param labelFragments Node label
      */
-    void startGraph(String[] labelFragments);
+    @SuppressWarnings("RedundantThrows")
+    void startGraph(String[] labelFragments) throws Exception;
 
     /**
      * Invoked when iteration of the current graph is finished.
      */
-    void endGraph();
+    @SuppressWarnings("RedundantThrows")
+    void endGraph() throws Exception;
 
     /**
      * Invoked when visiting an edge in the current graph.
      * @param probability Probability for the edge
      * @param labelFragments Target node label
      */
+    @SuppressWarnings("RedundantThrows")
     void addEdge(double     probability,
-                 String[]   labelFragments);
+                 String[]   labelFragments)
+        throws Exception;
 }
 
 
@@ -481,6 +487,7 @@ public class MarkovChain {
     /**
      * @return Window size
      */
+    @SuppressWarnings("unused")
     public int getWindow() {
         return _window;
     }
@@ -488,39 +495,32 @@ public class MarkovChain {
     /**
      * Load markov model from json array.
      * @param pairs Pairs of nodes with an associated probability between them
-     * @return {@code true} on success
+     * @throws JSONException if failed
      */
-    boolean load(JSONArray pairs) {
+    void load(JSONArray pairs) throws JSONException {
 
-        try {
-            for (int i = 0; i < pairs.length(); i++) {
-                JSONObject e = pairs.getJSONObject(i);
-                JSONArray from = e.getJSONArray(Config.JSON_FROM);
-                Label l1 = createLabel(from);
-                JSONArray to = e.getJSONArray(Config.JSON_TO);
-                Label l2 = createLabel(to);
-                double probability = e.getDouble(Config.JSON_PROBABILITY);
+        for (int i = 0; i < pairs.length(); i++) {
+            JSONObject e = pairs.getJSONObject(i);
+            JSONArray from = e.getJSONArray(Config.JSON_FROM);
+            Label l1 = createLabel(from);
+            JSONArray to = e.getJSONArray(Config.JSON_TO);
+            Label l2 = createLabel(to);
+            double probability = e.getDouble(Config.JSON_PROBABILITY);
 
-                Node n1 = _nodes.get(l1);
-                if (null == n1) {
-                    n1 = new Node(l1);
-                    _nodes.put(n1.getLabel(), n1);
-                }
-                Node n2 = _nodes.get(l2);
-                if (null == n2) {
-                    n2 = new Node(l2);
-                    _nodes.put(n2.getLabel(), n2);
-                }
-
-                Edge edge = new Edge(n2, probability);
-                n1.addEdge(edge);
+            Node n1 = _nodes.get(l1);
+            if (null == n1) {
+                n1 = new Node(l1);
+                _nodes.put(n1.getLabel(), n1);
             }
-        } catch (JSONException e) {
-            // TODO error handling
-            return false;
-        }
+            Node n2 = _nodes.get(l2);
+            if (null == n2) {
+                n2 = new Node(l2);
+                _nodes.put(n2.getLabel(), n2);
+            }
 
-        return true;
+            Edge edge = new Edge(n2, probability);
+            n1.addEdge(edge);
+        }
     }
 
     /**
@@ -702,7 +702,7 @@ public class MarkovChain {
      * Walk the entire markov chain.
      * @param listener Data readout interface
      */
-    public void traverse(Stream listener) {
+    public void traverse(Stream listener) throws Exception {
 
         // Visit all nodes
         listener.startModel(_window);
@@ -776,7 +776,8 @@ public class MarkovChain {
             return false;
 
         String test = map.get(l2);
-        if (!test.equals("test"))
+        //noinspection RedundantIfStatement
+        if (!Objects.equals(test, "test"))
             return false;
 
         return true;

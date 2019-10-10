@@ -25,6 +25,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -33,6 +34,7 @@ import static org.junit.Assert.assertTrue;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 
+@SuppressWarnings("unused")
 public class MarkovChainTest {
 
     private final static int _WINDOW = 1;
@@ -40,6 +42,7 @@ public class MarkovChainTest {
     @Test
     public void markov_ctor() {
         MarkovChain mc = new MarkovChain(MarkovChainTest._WINDOW);
+        assertNotNull(mc);
     }
 
     @Test
@@ -75,6 +78,7 @@ public class MarkovChainTest {
     @Test
     public void markov_createChain() {
         MarkovChain mc = createFooBarBazChain();
+        assertNotNull(mc);
     }
 
     @Test
@@ -233,6 +237,7 @@ public class MarkovChainTest {
             String place2 = "";
             List<String> phrase2 = details.getEntries().getFirst().getPlaceholder().getPhrase();
             for (int i = 0; i < phrase2.size(); i++) {
+                //noinspection StringConcatenationInLoop
                 place2 += phrase2.get(i);
                 if (i < phrase2.size() - 1) {
                     place2 += " ";
