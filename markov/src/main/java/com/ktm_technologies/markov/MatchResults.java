@@ -97,15 +97,12 @@ class MatchResults {
     public class Placeholder extends Match {
 
         private final String        _keyword;
-        private final int           _offset;
 
         Placeholder(String  keyword,
                     int     offset) {
 
             super(offset);
-
             _keyword = keyword;
-            _offset = offset;
         }
 
         void append(String word) {
