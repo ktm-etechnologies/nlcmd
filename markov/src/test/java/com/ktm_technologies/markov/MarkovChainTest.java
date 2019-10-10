@@ -145,10 +145,10 @@ public class MarkovChainTest {
         MarkovChain mc = new MarkovChain(MarkovChainTest._WINDOW);
         List<String> model = new LinkedList<>(Arrays.asList("a", "b", "c", "d", "e", "f"));
         List<String> phrase = new LinkedList<>(Arrays.asList("x", "y", "c", "d", "e", "z"));
-        MatchResults details = new MatchResults();
+        Result details = new Result();
         mc.train(model);
         mc.scan(phrase, details);
-        MatchResults.Phrase entry = details.getEntries().getFirst();
+        Result.Phrase entry = details.getEntries().getFirst();
         assertArrayEquals(entry.getPhrase().toArray(), new String[] {"c", "d", "e"});
         assertEquals(entry.getAvgProbability(), 1.0, 0.0001);
         assertEquals(entry.getOffset(), 2);
@@ -159,10 +159,10 @@ public class MarkovChainTest {
         MarkovChain mc = new MarkovChain(MarkovChainTest._WINDOW);
         List<String> model = new LinkedList<>(Arrays.asList("a", "b", "c", "d", "e", "f", "g", "h"));
         List<String> match = new LinkedList<>(Arrays.asList("x", "b", "c", "y", "d", "e", "f", "z"));
-        MatchResults details = new MatchResults();
+        Result details = new Result();
         mc.train(model);
         mc.scan(match, details);
-        MatchResults.Phrase entry;
+        Result.Phrase entry;
         // First match
         entry = details.getEntries().getFirst();
         assertArrayEquals(entry.getPhrase().toArray(), new String[] {"b", "c"});
@@ -187,7 +187,7 @@ public class MarkovChainTest {
     public void markov_scanW2Full() {
         MarkovChain mc = MarkovChainTest.createFoxChainW2();
         List<String> phrase = new LinkedList<>(Arrays.asList("the quick brown fox jumps over the lazy dog".split( " ")));
-        MatchResults details = new MatchResults();
+        Result details = new Result();
         double result = mc.scan(phrase, details);
         assertEquals(1.0, result, 0.0001);
         assertEquals(1, details.getEntries().size());
@@ -197,7 +197,7 @@ public class MarkovChainTest {
     public void markov_scanW2Sub() {
         MarkovChain mc = MarkovChainTest.createFoxChainW2();
         List<String> phrase = new LinkedList<>(Arrays.asList("fox jumps over".split( " ")));
-        MatchResults details = new MatchResults();
+        Result details = new Result();
         double result = mc.scan(phrase, details);
         assertEquals(1.0, result, 0.0001);
         assertEquals(1, details.getEntries().size());
@@ -213,7 +213,7 @@ public class MarkovChainTest {
         // out.close();
 
         List<String> phrase = new LinkedList<>(Arrays.asList("erstelle route nach Munderfing".split( " ")));
-        MatchResults details = new MatchResults();
+        Result details = new Result();
         double result = mc.scan(phrase, details);
         assertEquals(1.0, result, 0.0001);
         assertEquals("<location>", details.getEntries().getFirst().getPlaceholder().getToken());
@@ -229,7 +229,7 @@ public class MarkovChainTest {
 
             String s = "füge wegpunkt in " + place + " zusätzlich ein";
             List<String> phrase = new LinkedList<>(Arrays.asList(s.split( " ")));
-            MatchResults details = new MatchResults();
+            Result details = new Result();
             double result = mc.scan(phrase, details);
             assertEquals(1.0, result, 0.0001);
             assertEquals("<location>", details.getEntries().getFirst().getPlaceholder().getToken());

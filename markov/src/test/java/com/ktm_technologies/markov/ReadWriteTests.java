@@ -104,7 +104,7 @@ public class ReadWriteTests {
 
         MarkovChain mc1 = MarkovChainTest.createFoxChainW1();
         List<String> phrase = new LinkedList<>(Arrays.asList("over", "the", "lazy", "dog"));
-        double result1 = mc1.scan(phrase, new MatchResults());
+        double result1 = mc1.scan(phrase, new Result());
         assertEquals(0.83333, result1, 0.0001);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -114,7 +114,7 @@ public class ReadWriteTests {
         ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
         MarkovChain mc2 = JsonReader.read(in);
         assert mc2 != null;
-        MatchResults match = new MatchResults();
+        Result match = new Result();
         double result2 = mc2.scan(phrase, match);
         assertEquals(result1, result2, 0.0001);
     }
@@ -124,7 +124,7 @@ public class ReadWriteTests {
 
         MarkovChain mc1 = MarkovChainTest.createFoxChainW2();
         List<String> phrase = new LinkedList<>(Arrays.asList("over", "the", "lazy", "dog"));
-        double result1 = mc1.scan(phrase, new MatchResults());
+        double result1 = mc1.scan(phrase, new Result());
         assertEquals(1.0, result1, 0.0001);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -134,7 +134,7 @@ public class ReadWriteTests {
         ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
         MarkovChain mc2 = JsonReader.read(in);
         assert mc2 != null;
-        MatchResults match = new MatchResults();
+        Result match = new Result();
         double result2 = mc2.scan(phrase, match);
         assertEquals(result1, result2, 0.0001);
     }
