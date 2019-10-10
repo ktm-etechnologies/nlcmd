@@ -1,1 +1,1 @@
-include ':app', ':markovspeech'
+include ':app', ':markov'
