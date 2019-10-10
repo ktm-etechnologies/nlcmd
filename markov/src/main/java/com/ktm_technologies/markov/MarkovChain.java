@@ -166,6 +166,13 @@ class Edge {
     }
 }
 
+class ReflexiveEdge extends Edge {
+
+    ReflexiveEdge(Node node) {
+        super(node, 1.0);
+    }
+}
+
 /**
  * Represents a node in the chain.
  */
@@ -206,6 +213,97 @@ class Node {
     }
 
     /**
+     * Query whether an edge to a node labelled "label" exists
+     * @param label Target node label
+     * @return Edge object if found, or null
+     */
+    Edge queryEdge(Label label, MatchResults details, int offset) {
+
+        Edge edge =  _edges.get(label);
+
+        // Fall back to placeholder matching.
+        if (null == edge) {
+
+            // 1)
+            // Find node of form <prefix> <placeholder> <last-fragment>
+            // If found, this terminates consuming input into a placeholder
+            for (Edge e : _edges.values()) {
+
+                String[] frags1 = e.getNode().getLabel().getFragments();
+                String[] frags2 = label.getFragments();
+                int last = frags1.length - 1;
+
+                // Placeholder
+                if (last > 0 &&
+                    !SlidingWindow.isPlaceholder(frags1[last - 1])) {
+                    continue;
+                }
+
+                // Last fragment
+                if (last > 0 &&
+                    frags1[last].equals(frags2[last])) {
+                    edge = e;
+                    break;
+                }
+            }
+
+            // 2)
+            // Find node of form <prefix> <placeholder>
+            // This would start consuming into a placeholder
+            for (Edge e : _edges.values()) {
+
+                String[] frags1 = e.getNode().getLabel().getFragments();
+                String[] frags2 = label.getFragments();
+                int last = frags1.length - 1;
+
+                // Match prefix
+                int i;
+                for (i = 0; i < last - 1; i++) {
+                    if (!frags1[i].equals(frags2[i])) {
+                        break;
+                    }
+                }
+                if (i < last - 1) {
+                    continue;
+                }
+
+                // Ensure placeholder
+                if (last >= 0 &&
+                    SlidingWindow.isPlaceholder(frags1[last])) {
+                    edge = e;
+                    details.createPlaceholder(frags1[last], frags2[last], offset);
+                    break;
+                }
+            }
+
+            // 3)
+            // If no node found above, make sure this node can consume
+            // input in the placeholder
+            if (null == edge) {
+
+                String[] frags1 = _label.getFragments();
+                String[] frags2 = label.getFragments();
+                int last = frags1.length - 1;
+
+                // Ensure placeholder
+                if (SlidingWindow.isPlaceholder(frags1[last])) {
+                    // If matching, return reflexive edge back to self,
+                    // to consume more input and then try to find subsequent node
+                    edge = new ReflexiveEdge(this);
+                    details.appendPlaceholder(frags2[last]);
+                }
+            }
+
+            // Reset if placeholder matching failed
+            if (null == edge) {
+                details.resetPlaceholder();
+            }
+        }
+
+        return edge;
+    }
+
+    /**
      * Add new edge to node.
      * @param node Target node
      */
@@ -234,36 +332,6 @@ class Node {
     }
 }
 
-class PlaceholderNode extends Node {
-
-    private final Node _parent;
-
-    PlaceholderNode(Node node) {
-        super(node.getLabel());
-        _parent = node;
-    }
-
-    @Override
-    Label getLabel() {
-        return _parent.getLabel();
-    }
-
-    @Override
-    HashMap<Label, Edge> getEdges() {
-        return _parent.getEdges();
-    }
-
-    @Override
-    void addEdge(Edge edge) {
-        _parent.addEdge(edge);
-    }
-
-    @Override
-    void addEdge(Node node) {
-        _parent.addEdge(node);
-    }
-}
-
 /**
  * Represents a sliding window over a phrase.
  */
@@ -271,7 +339,6 @@ class SlidingWindow {
 
     private final List<String>  _phrase;
     private final int           _size;
-    private boolean             _isPlaceholder = false;
 
     /**
      * Create SlidingWindow object.
@@ -283,16 +350,6 @@ class SlidingWindow {
         _phrase = new LinkedList<>(phrase);
         _size = size;
     }
-
-    /**
-     * @return TRUE if visited placeholder label and not yet reset back to normal mode
-     */
-    boolean isPlaceholder() { return _isPlaceholder; }
-
-    /**
-     * Reset after normal matching has been resumed.
-     */
-    void resetPlaceholder() { _isPlaceholder = false; }
 
     /**
      * @return true if the window can slide further
@@ -314,9 +371,6 @@ class SlidingWindow {
         String[] fragments = new String[_size];
         for (int i = 0; i < _size; i++) {
             fragments[i] = _phrase.get(i);
-            if (isPlaceholder(fragments[i])) {
-                _isPlaceholder = true;
-            }
         }
 
         _phrase.remove(0);
@@ -325,13 +379,13 @@ class SlidingWindow {
     }
 
     /**
-     * @param word
+     * @param token Input word
      * @return TRUE if #word is a keyword, otherwise FALSE
      */
-    static boolean isPlaceholder(String word) {
+    static boolean isPlaceholder(String token) {
 
-        if (word.startsWith("<") &&
-            word.endsWith(">")) {
+        if (token.startsWith("<") &&
+            token.endsWith(">")) {
             return true;
         }
 
@@ -483,60 +537,6 @@ public class MarkovChain {
     }
 
     /**
-     * Check if {@code node} has an outgoing label {@code label} taking placeholders into account.
-     * @param node Current node
-     * @param label Outgoing label to look for
-     * @return {@code true} if {@code label} can be matched
-     */
-    /*
-    private boolean _matchPlaceholder(Node  node,
-                                      Label label,
-                                      boolean firstMatch) {
-
-    //        There are 4 cases to cover:
-    //        Label: foo bar baz      # input phrase
-    //     Node:  1. foo bar baz      # literal match ... covered outside this function
-    //            2. foo bar <x>      # placeholder end of node ......... if firstMatch == true
-    //            3. foo <x> baz      # placeholder middle of node ...... not considered at the moment
-    //            4. <x> bar baz      # placeholder beginning of node ... if firstMatch == false
-    //                                # will fall back to 2. if fails
-
-        TODO
-
-        boolean match = false;
-        for (Edge edge : node.getEdges().values()) {
-
-            String[] frags1 = edge.getNode().getLabel().getFragments();
-            String[] frags2 = label.getFragments();
-            match = false;
-            int i;
-            for (i = 0; i < frags2.length; i++) {
-
-                // Placeholder matches everything
-                if (SlidingWindow.isPlaceholder(frags1[i])) {
-                    match = true;
-                    break;
-                }
-
-                if (!frags1[i].equals(frags2[i])) {
-                    break;
-                }
-            }
-
-            if (i > frags2.length) {
-                match = true;
-            }
-
-            if (match) {
-                break;
-            }
-        }
-
-        return match;
-    }
-*/
-
-    /**
      * Scan #phrase for single match against model.
      *
      * After a single sub-phrase has been matched, this will return as soon as the match .
@@ -576,49 +576,23 @@ public class MarkovChain {
 
         // Match chain
         int nEdges = 0;
-        MatchResults.Placeholder placeholder = null;
         while (sw.canSlide()) {
 
             Label label = sw.slide();
-            Edge edge = node.getEdges().get(label);
+            Edge edge = node.queryEdge(label, details, offset + nEdges);
             if (edge != null) {
                 nEdges++;
                 sumProbabilities += edge.getProbability();
                 node = edge.getNode();
-                // Found a match, so reset eventual placeholder scanning
-                // and store away placeholder details
-                if (placeholder != null) {
-                    sw.resetPlaceholder();
-                    placeholder = null;
-                }
-            } else if (false /*_matchPlaceholder(node, label)*/) {
-
-                String word = label.getFragments()[label.getFragments().length - 1];
-                if (placeholder == null) {
-                    // Starting to match against placeholder
-                    placeholder = details.createPlaceholder(word, offset + nEdges);
-                    // Phrase eaten up by placeholder always gets probability 1
-                    nEdges++;
-                    sumProbabilities += 1;
-                } else {
-                    // Accumulate placeholder phrase
-                    placeholder.append(word);
-                }
             } else {
                 break;
             }
         }
 
-        // Found a match, so reset eventual placeholder scanning
-        // and store away placeholder details
-        if (placeholder != null) {
-            sw.resetPlaceholder();
-        }
-
         // Capture details
         double avgProbability = sumProbabilities / nEdges;
         List<String> subPhrase = phrase.subList(offset, offset + nEdges + _window);
-        details.append(subPhrase, phraseOffset + offset, avgProbability, placeholder);
+        details.append(subPhrase, phraseOffset + offset, avgProbability);
 
         return avgProbability;
     }
@@ -655,7 +629,7 @@ public class MarkovChain {
         do {
             avgProbability = _scanSingleMatch(subPhrase, offset, details);
             if (avgProbability > 0.0) {
-                MatchResults.Phrase entry = (MatchResults.Phrase) /* TODO */ details.getEntries().getLast();
+                MatchResults.Phrase entry = details.getEntries().getLast();
                 offset = entry.getOffset() + entry.getPhrase().size();
                 subPhrase = phrase.subList(offset, phrase.size());
             }
@@ -718,7 +692,7 @@ public class MarkovChain {
      * Test inner class Label
      * @return TRUE if successful
      */
-    public static boolean testLabel() {
+    static boolean testLabel() {
 
         Label l1 = new Label(new String[]{"foo", "bar"});
         Label l2 = new Label(new String[]{"foo", "bar"});

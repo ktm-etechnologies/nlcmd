@@ -17,12 +17,8 @@
 package com.ktm_technologies.markov;
 
 
-
 import org.junit.Test;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -148,7 +144,7 @@ public class MarkovChainTest {
         MatchResults details = new MatchResults();
         mc.train(model);
         mc.scan(phrase, details);
-        MatchResults.Phrase entry = (MatchResults.Phrase) details.getEntries().getFirst();
+        MatchResults.Phrase entry = details.getEntries().getFirst();
         assertArrayEquals(entry.getPhrase().toArray(), new String[] {"c", "d", "e"});
         assertEquals(entry.getAvgProbability(), 1.0, 0.0001);
         assertEquals(entry.getOffset(), 2);
@@ -164,12 +160,12 @@ public class MarkovChainTest {
         mc.scan(match, details);
         MatchResults.Phrase entry;
         // First match
-        entry = (MatchResults.Phrase) details.getEntries().getFirst();
+        entry = details.getEntries().getFirst();
         assertArrayEquals(entry.getPhrase().toArray(), new String[] {"b", "c"});
         assertEquals(entry.getAvgProbability(), 1.0, 0.0001);
         assertEquals(entry.getOffset(), 1);
         // Second match
-        entry = (MatchResults.Phrase) details.getEntries().getLast();
+        entry = details.getEntries().getLast();
         assertArrayEquals(entry.getPhrase().toArray(), new String[] {"d", "e", "f"});
         assertEquals(entry.getAvgProbability(), 1.0, 0.0001);
         assertEquals(entry.getOffset(), 4);
@@ -203,7 +199,6 @@ public class MarkovChainTest {
         assertEquals(1, details.getEntries().size());
     }
 
-    /*
     @Test
     public void markov_scanW2EndPlaceholder() {
 
@@ -217,29 +212,35 @@ public class MarkovChainTest {
         MatchResults details = new MatchResults();
         double result = mc.scan(phrase, details);
         assertEquals(1.0, result, 0.0001);
-        assertEquals("Munderfing", details.getEntries().getFirst().getPlaceholder().getToken());
+        assertEquals("<location>", details.getEntries().getFirst().getPlaceholder().getToken());
+        assertEquals("Munderfing", details.getEntries().getFirst().getPlaceholder().getPhrase().get(0));
     }
 
     @Test
     public void markov_scanW2MidPlaceholder() {
 
         MarkovChain mc = MarkovChainTest.createPlaceholderMidChainW2();
-        OutputStream out = new PrintStream(System.out);
-        DotWriter writer = new DotWriter("Location", out);
-        mc.traverse(writer);
-        try {
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String[] places = { "Munderfing", "St. Georgen", "Höflein an der hohen Wand"};
+        for (String place : places) {
 
-        List<String> phrase = new LinkedList<>(Arrays.asList("füge wegpunkt in Munderfing zusätzlich ein".split( " ")));
-        MatchResults details = new MatchResults();
-        double result = mc.scan(phrase, details);
-        assertEquals(1.0, result, 0.0001);
-        assertEquals("Munderfing", details.getEntries().getFirst().getPlaceholder().getToken());
+            String s = "füge wegpunkt in " + place + " zusätzlich ein";
+            List<String> phrase = new LinkedList<>(Arrays.asList(s.split( " ")));
+            MatchResults details = new MatchResults();
+            double result = mc.scan(phrase, details);
+            assertEquals(1.0, result, 0.0001);
+            assertEquals("<location>", details.getEntries().getFirst().getPlaceholder().getToken());
+            // Fold phrase matched by placeholder back to location name string for comparison
+            String place2 = "";
+            List<String> phrase2 = details.getEntries().getFirst().getPlaceholder().getPhrase();
+            for (int i = 0; i < phrase2.size(); i++) {
+                place2 += phrase2.get(i);
+                if (i < phrase2.size() - 1) {
+                    place2 += " ";
+                }
+            }
+            assertEquals(place, place2);
+        }
     }
-    */
 
     @Test
     public void markov_testLabel() {
@@ -297,14 +298,14 @@ public class MarkovChainTest {
         return mc;
     }
 
-    static MarkovChain createPlaceholderEndChainW2() {
+    private static MarkovChain createPlaceholderEndChainW2() {
         MarkovChain mc = new MarkovChain(2);
         List<String> phrase = new LinkedList<>(Arrays.asList("erstelle route nach <location>".split( " ")));
         mc.train(phrase);
         return mc;
     }
 
-    static MarkovChain createPlaceholderMidChainW2() {
+    private static MarkovChain createPlaceholderMidChainW2() {
         MarkovChain mc = new MarkovChain(2);
         List<String> phrase = new LinkedList<>(Arrays.asList("füge wegpunkt in <location> zusätzlich ein".split( " ")));
         mc.train(phrase);
