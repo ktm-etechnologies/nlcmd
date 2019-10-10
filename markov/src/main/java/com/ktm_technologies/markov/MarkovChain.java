@@ -55,7 +55,7 @@ class Label {
     /**
      * Compare to other label object
      * @param other Other object
-     * @return TRUE if matching
+     * @return {@code true} if matching
      */
     boolean equals(Label other) {
 
@@ -109,8 +109,10 @@ class Label {
     }
 }
 
+
+
 /**
- * Represents edge to #Node in the chain.
+ * Represents edge to {@link Node} in the chain.
  */
 class Edge {
 
@@ -166,12 +168,23 @@ class Edge {
     }
 }
 
+
+
+/**
+ * For temporary edge objects during placeholder matching.
+ */
 class ReflexiveEdge extends Edge {
 
+    /**
+     * Create ReflexiveEdge object
+     * @param node Target node
+     */
     ReflexiveEdge(Node node) {
         super(node, 1.0);
     }
 }
+
+
 
 /**
  * Represents a node in the chain.
@@ -332,6 +345,8 @@ class Node {
     }
 }
 
+
+
 /**
  * Represents a sliding window over a phrase.
  */
@@ -352,7 +367,7 @@ class SlidingWindow {
     }
 
     /**
-     * @return true if the window can slide further
+     * @return {@code true} if the window can slide further
      */
     boolean canSlide() {
         return _phrase.size() >= _size;
@@ -380,7 +395,7 @@ class SlidingWindow {
 
     /**
      * @param token Input word
-     * @return TRUE if #word is a keyword, otherwise FALSE
+     * @return {@code true} if {@code token} is a keyword
      */
     static boolean isPlaceholder(String token) {
 
@@ -393,10 +408,10 @@ class SlidingWindow {
     }
 }
 
+
 /**
  * Interface used to walk a markov chain.
  */
-
 interface Stream {
 
     /**
@@ -412,6 +427,7 @@ interface Stream {
 
     /**
      * Invoked when starting to iterate a graph inside the model.
+     * @param labelFragments Node label
      */
     void startGraph(String[] labelFragments);
 
@@ -422,11 +438,18 @@ interface Stream {
 
     /**
      * Invoked when visiting an edge in the current graph.
+     * @param probability Probability for the edge
+     * @param labelFragments Target node label
      */
-    void addEdge(double probability,
-                 String[] labelFragments);
+    void addEdge(double     probability,
+                 String[]   labelFragments);
 }
 
+
+
+/**
+ * Static configuration constants.
+ */
 class Config {
 
     final static Charset CHARSET = Charset.forName("UTF-8");
@@ -465,7 +488,7 @@ public class MarkovChain {
     /**
      * Load markov model from json array.
      * @param pairs Pairs of nodes with an associated probability between them
-     * @return TRUE on success
+     * @return {@code true} on success
      */
     boolean load(JSONArray pairs) {
 
@@ -571,7 +594,7 @@ public class MarkovChain {
     }
 
     /**
-     * Scan #phrase for single match against model.
+     * Scan {@code phrase} for single match against model.
      *
      * After a single sub-phrase has been matched, this will return as soon as the match .
      *
@@ -724,7 +747,7 @@ public class MarkovChain {
 
     /**
      * Test inner class Label
-     * @return TRUE if successful
+     * @return {@code true} if successful
      */
     static boolean testLabel() {
 
