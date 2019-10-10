@@ -25,7 +25,7 @@ import java.io.OutputStream;
 /**
  * Used for writing model JSON format.
  */
-public class JsonWriter implements TraverseInterface {
+public class JsonWriter implements Stream {
 
     private final String        _name;
     private final JSONObject    _json;
