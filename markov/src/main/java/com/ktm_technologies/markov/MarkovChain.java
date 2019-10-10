@@ -231,7 +231,7 @@ class Node {
      * @param label Target node label
      * @return Edge object if found, or null
      */
-    Edge queryEdge(Label label, MatchResults details, int offset) {
+    Edge queryEdge(Label label, Result details, int offset) {
 
         Edge edge =  _edges.get(label);
 
@@ -285,7 +285,8 @@ class Node {
                 if (last >= 0 &&
                     SlidingWindow.isPlaceholder(frags1[last])) {
                     edge = e;
-                    details.createPlaceholder(frags1[last], frags2[last], offset);
+                    details.createPlaceholder(frags1[last], offset);
+                    details.appendPlaceholder(frags2[last]);
                     break;
                 }
             }
@@ -396,7 +397,7 @@ class SlidingWindow {
 
     /**
      * @param token Input word
-     * @return {@code true} if {@code token} is a keyword
+     * @return {@code true} if {@code token} is a placeholder
      */
     @SuppressWarnings("RedundantIfStatement")
     static boolean isPlaceholder(String token) {
@@ -572,14 +573,14 @@ public class MarkovChain {
      */
     public double match(List<String> phrase) {
 
-        MatchResults  details;
+        Result details;
 
         // A phrase needs to be longer than the sliding window, otherwise there are no edges
         if (phrase.size() < _window + 1) {
             return -1.0;
         }
 
-        details = new MatchResults();
+        details = new Result();
         double avgProbability = _scanSingleMatch(phrase, 0, details);
 
         // Strict match, entire phrase needs to be in model.
@@ -606,7 +607,7 @@ public class MarkovChain {
      */
     private double _scanSingleMatch(List<String>        phrase,
                                     int                 phraseOffset,
-                                    MatchResults        details) {
+                                    Result details) {
 
         Node node = null;
         int offset = 0;
@@ -668,7 +669,7 @@ public class MarkovChain {
      * @return Average probability: sum of probabilities / number of edges for the best matching sub-phrase
      */
     public double scan(List<String>     phrase,
-                       MatchResults     details){
+                       Result details){
 
         // A phrase needs to be longer than the sliding window, otherwise there are no edges
         if (phrase.size() < _window + 1) {
@@ -676,7 +677,7 @@ public class MarkovChain {
         }
 
         if (details == null) {
-            details = new MatchResults();
+            details = new Result();
         }
 
         double avgProbabilityMax = 0.0;
@@ -686,7 +687,7 @@ public class MarkovChain {
         do {
             avgProbability = _scanSingleMatch(subPhrase, offset, details);
             if (avgProbability > 0.0) {
-                MatchResults.Phrase entry = details.getEntries().getLast();
+                Result.Phrase entry = details.getEntries().getLast();
                 offset = entry.getOffset() + entry.getPhrase().size();
                 subPhrase = phrase.subList(offset, phrase.size());
             }
@@ -781,5 +782,179 @@ public class MarkovChain {
             return false;
 
         return true;
+    }
+}
+
+/**
+ * Used to capture statistics when querying the markov chain.
+ */
+class Result {
+
+    /**
+     * Abstract baseclass for phrase- and placeholder matches.
+     */
+    abstract class Match {
+
+        private final int       _offset;
+        private List<String>    _matchPhrase = new LinkedList<>();
+
+        /**
+         * Abstract constructor.
+         * @param offset Offset of match
+         */
+        Match(int offset) {
+            _offset = offset;
+        }
+
+        /**
+         * @return Part of phrase that matched
+         */
+        List<String> getPhrase() { return _matchPhrase; }
+
+        /**
+         * @param phrase Phrase represented by this match
+         */
+        void setPhrase(List<String> phrase) { _matchPhrase = phrase; }
+
+        /**
+         * @return Offset of subPhrase in full query phrase
+         */
+        int getOffset() { return _offset; }
+
+        void append(String word) {
+            _matchPhrase.add(word);
+        }
+    }
+
+    /**
+     * Represents a match found against the markov chain.
+     */
+    class Phrase extends Match {
+
+        private final double            _avgProbability;
+        private final Placeholder       _placeholder;
+
+        /**
+         * Create {@link Phrase} object.
+         * @param matchPhrase Part of phrase that matched
+         * @param offset Offset of matchPhrase in full query phrase
+         * @param avgProbability Averaged probability of edges in matchPhrase
+         * @param placeholder Phrase matched by placeholder or null
+         */
+        Phrase(List<String>     matchPhrase,
+               int              offset,
+               double           avgProbability,
+               Placeholder      placeholder) {
+
+            super(offset);
+
+            _avgProbability = avgProbability;
+            _placeholder = placeholder;
+            this.setPhrase(matchPhrase);
+        }
+
+        /**
+         * @return Averaged probability of edges in subPhrase
+         */
+        double getAvgProbability() {
+            return _avgProbability;
+        }
+
+        /**
+         * @return Placeholder match or null
+         */
+        Placeholder getPlaceholder() { return _placeholder; }
+    }
+
+    /**
+     * Placeholder match wrapper.
+     */
+    public class Placeholder extends Match {
+
+        private final String _token;
+
+        /**
+         * Create {@link Placeholder} object.
+         * @param token Placeholder word
+         * @param offset Offset in current sub-phrase
+         */
+        Placeholder(String  token,
+                    int     offset) {
+
+            super(offset);
+            _token = token;
+        }
+
+        /**
+         * Append {@code word} to the matched content.
+         * @param word Input word
+         */
+        void append(String word) {
+            super.append(word);
+        }
+
+        /**
+         * @return Part of phrase that matched
+         */
+        String getToken() {
+            return _token;
+        }
+    }
+
+    private final LinkedList<Phrase>    _entries = new LinkedList<>();
+    private Placeholder                 _tmpPlaceholder = null;
+
+    /**
+     * Container object for matches
+     */
+    Result() {}
+
+    /**
+     * Add match entry.
+     * @param matchPhrase Part of phrase that matched
+     * @param offset Offset of matchPhrase in full query phrase
+     * @param avgProbability Averaged probability of edges in matchPhrase
+     */
+    void append(List<String>    matchPhrase,
+                int             offset,
+                double          avgProbability) {
+
+        _entries.add(new Phrase(matchPhrase, offset, avgProbability, _tmpPlaceholder));
+        resetPlaceholder();
+    }
+
+    /**
+     * @return List of match entries
+     */
+    LinkedList<Phrase> getEntries() {
+        return _entries;
+    }
+
+    /**
+     * Create new placeholder item associated to currently matched sub-phrase.
+     * @param token Placeholder word
+     * @param offset Offset of token in current sub-phrase
+     */
+    void createPlaceholder(String   token,
+                           int      offset) {
+
+        _tmpPlaceholder = new Placeholder(token, offset);
+    }
+
+    /**
+     * Append {}@code word} to current placeholder.
+     * @param word Input word
+     */
+    void appendPlaceholder(String word) {
+
+        _tmpPlaceholder.append(word);
+    }
+
+    /**
+     * Reset currently accumulated placeholder after failed match.
+     */
+    void resetPlaceholder() {
+
+        _tmpPlaceholder = null;
     }
 }
