@@ -24,7 +24,9 @@ public class Result {
         /**
          * @return Part of phrase that matched
          */
-        List<String> getPhrase() { return _matchPhrase; }
+
+        public List<String> getPhrase() { return _matchPhrase; }
+
 
         /**
          * @param phrase Phrase represented by this match
@@ -68,6 +70,12 @@ public class Result {
             this.setPhrase(matchPhrase);
         }
 
+        @Override
+
+        /**
+         * @return Part of phrase that matched
+         */
+        public List<String> getPhrase() { return super.getPhrase(); }
         /**
          * @return Averaged probability of edges in subPhrase
          */
@@ -78,7 +86,10 @@ public class Result {
         /**
          * @return Placeholder match or null
          */
-        Placeholder getPlaceholder() { return _placeholder; }
+
+
+        public Placeholder getPlaceholder() { return _placeholder; }
+
     }
 
     /**
@@ -141,7 +152,8 @@ public class Result {
     /**
      * @return List of match entries
      */
-    LinkedList<Phrase> getEntries() {
+
+    public LinkedList<Phrase> getEntries() {
         return _entries;
     }
 
@@ -155,6 +167,14 @@ public class Result {
 
         _tmpPlaceholder = new Placeholder(token, offset);
     }
+
+    /**
+     * @return Part of phrase that matched
+     */
+    public List<String> getPhrase() throws Exception{
+        return _entries.getFirst().getPhrase(); }
+
+    public Placeholder getPlaceholder() throws Exception { return _entries.getFirst().getPlaceholder(); }
 
     /**
      * Append {}@code word} to current placeholder.

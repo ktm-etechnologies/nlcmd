@@ -24,6 +24,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -476,7 +478,38 @@ public class MarkovChain {
 
     private final HashMap<Label, Node>  _nodes = new HashMap<>();
     private final int                   _window;
+    private final ArrayList<List<String>> phraseList=new ArrayList<>();
 
+    public double matchingFaktor(List<String> resultingPhrase){
+        double faktor=0;
+        double tempCount=0;
+        int tempN=0;
+        for(int n=0;n<phraseList.size();n++){
+            List<String> testPhrase=phraseList.get(n);
+            int p=0;
+            int counter=0;
+            for(int k=0;k<testPhrase.size();k++){
+                if(testPhrase.get(k).equals(resultingPhrase.get(p))){
+                    p++;
+                    if(p>counter){
+                        counter=p;
+                    }
+                    if(p>=resultingPhrase.size()){
+                        break;
+                    }
+                }
+                else{
+                    p=0;
+                }
+            }
+            if(counter>tempCount) {
+                tempN=n;
+                tempCount = counter;
+            }
+        }
+        faktor=tempCount/phraseList.get(tempN).size();
+        return faktor;
+    }
     /**
      * Create MarkovChain object.
      * @param window Window size
@@ -536,7 +569,7 @@ public class MarkovChain {
         if (phrase.size() <= _window) {
             return;
         }
-
+        phraseList.add(phrase);
         SlidingWindow sw = new SlidingWindow(phrase, _window);
         Label label = sw.slide();
         Node root = _nodes.get(label);
@@ -635,7 +668,6 @@ public class MarkovChain {
         // Match chain
         int nEdges = 0;
         while (sw.canSlide()) {
-
             Label label = sw.slide();
             Edge edge = node.queryEdge(label, details, offset + nEdges);
             if (edge != null) {
@@ -648,7 +680,7 @@ public class MarkovChain {
         }
 
         // Capture details
-        double avgProbability = sumProbabilities / nEdges;
+        double avgProbability = sumProbabilities /nEdges ;
         List<String> subPhrase = phrase.subList(offset, offset + nEdges + _window);
         details.append(subPhrase, phraseOffset + offset, avgProbability);
 
