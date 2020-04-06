@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -40,9 +39,34 @@ public class CommandSetTest {
     private final static int _WINDOW = 2;
 
     @Test
+    public void command_train() {
+
+        String[] commands = {
+            "set destination <location>",
+            "set <location> as destination",
+            "set route to <location>",
+            "go to <location>",
+            "navigate to <location>",
+            "load route to <location>"
+        };
+        CommandSet cs = new CommandSet(_WINDOW);
+        cs.put("destination", commands);
+
+        List<String> phrase = Arrays.asList("load route to Munderfing".split(" "));
+        HashMap<List<String>, Double> matches = new HashMap<>();
+        String key = cs.scan(phrase, matches, null);
+        assertEquals(key, "destination");
+        for (Map.Entry<List<String>, Double> entry : matches.entrySet()) {
+            assertEquals(phrase, entry.getKey());
+            assertEquals(entry.getValue(), 1.0, 0.0001);
+            break;
+        }
+    }
+
+    @Test
     public void command_matchNavigation() {
 
-        CommandSet cs = new CommandSet();
+        CommandSet cs = new CommandSet(_WINDOW);
         cs.put("destination", createDestinationChainW2());
         cs.put("waypoint", createWaypointChainW2());
         cs.put("skip", createSkipWaypointChainW2());
@@ -54,23 +78,23 @@ public class CommandSetTest {
     @Test
     public void command_scanNavigation() {
 
-        CommandSet cs = new CommandSet();
+        CommandSet cs = new CommandSet(_WINDOW);
         cs.put("destination", createDestinationChainW2());
         cs.put("waypoint", createWaypointChainW2());
         cs.put("skip", createSkipWaypointChainW2());
 
-        LinkedList<String> phrase = new LinkedList<>(Arrays.asList("load route to Munderfing".split(" ")));
+        List<String> phrase = Arrays.asList("load route to Munderfing".split(" "));
         HashMap<List<String>, Double> matches = new HashMap<>();
         String key = cs.scan(phrase, matches, null);
         assertEquals(key, "destination");
         for (Map.Entry<List<String>, Double> entry : matches.entrySet()) {
-            assertTrue(phrase.equals(entry.getKey()));
+            assertEquals(phrase, entry.getKey());
             assertEquals(entry.getValue(), 1.0, 0.0001);
             break;
         }
     }
 
-    static MarkovChain createDestinationChainW2() {
+    private static MarkovChain createDestinationChainW2() {
         MarkovChain mc = new MarkovChain(_WINDOW);
         Object[] phrases = {
                 new LinkedList<>(Arrays.asList("set destination <location>".split(" "))),
@@ -86,7 +110,7 @@ public class CommandSetTest {
         return mc;
     }
 
-    static MarkovChain createWaypointChainW2() {
+    private static MarkovChain createWaypointChainW2() {
         MarkovChain mc = new MarkovChain(_WINDOW);
         Object[] phrases = {
                 new LinkedList<>(Arrays.asList("set waypoint in <location>".split(" "))),
@@ -103,7 +127,7 @@ public class CommandSetTest {
         return mc;
     }
 
-    static MarkovChain createSkipWaypointChainW2() {
+    private static MarkovChain createSkipWaypointChainW2() {
         MarkovChain mc = new MarkovChain(_WINDOW);
         Object[] phrases = {
                 new LinkedList<>(Arrays.asList("delete next waypoint".split(" "))),

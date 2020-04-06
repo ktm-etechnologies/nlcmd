@@ -16,6 +16,7 @@
 
 package com.ktm_technologies.markov;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,6 +25,41 @@ import java.util.List;
  * {@link com.ktm_technologies.markov.MarkovChain}.
  */
 public class CommandSet extends HashMap<String, MarkovChain> {
+
+    private int _window;
+
+    /**
+     * Create CommandSet object
+     *
+     * @param window Window size for markov chains created via the
+     * {@link com.ktm_technologies.markov.CommandSet#put(String, String[])} method.
+     *
+     * @throws ArrayIndexOutOfBoundsException If window < 1
+     */
+    public CommandSet(int window) throws ArrayIndexOutOfBoundsException {
+
+        if (window < 1) {
+            throw new ArrayIndexOutOfBoundsException("MarkovChain window size can not be < 1");
+        }
+        _window = window;
+    }
+
+    /**
+     * Shortcut for adding markov chains
+     *
+     * @param key Identifier for this command
+     * @param commands Training phrases for the markov chain
+     */
+    public void put(String      key,
+                    String[]    commands) {
+
+        MarkovChain mc = new MarkovChain(_window);
+        for (String command : commands) {
+            List<String> phrase = Arrays.asList(command.split(" "));
+            mc.train(phrase);
+        }
+        this.put(key, mc);
+    }
 
     /**
      * Match phrase against all commands and return key for best matching command markov chain.
