@@ -1,9 +1,10 @@
 package com.ktm_technologies.markov;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Result {
+class Result {
 
     /**
      * Abstract baseclass for phrase- and placeholder matches.
@@ -24,9 +25,7 @@ public class Result {
         /**
          * @return Part of phrase that matched
          */
-
-        public List<String> getPhrase() { return _matchPhrase; }
-
+        List<String> getPhrase() { return _matchPhrase; }
 
         /**
          * @param phrase Phrase represented by this match
@@ -70,12 +69,6 @@ public class Result {
             this.setPhrase(matchPhrase);
         }
 
-        @Override
-
-        /**
-         * @return Part of phrase that matched
-         */
-        public List<String> getPhrase() { return super.getPhrase(); }
         /**
          * @return Averaged probability of edges in subPhrase
          */
@@ -86,16 +79,13 @@ public class Result {
         /**
          * @return Placeholder match or null
          */
-
-
-        public Placeholder getPlaceholder() { return _placeholder; }
-
+        Placeholder getPlaceholder() { return _placeholder; }
     }
 
     /**
      * Placeholder match wrapper.
      */
-    public class Placeholder extends Match {
+    class Placeholder extends Match {
 
         private final String _token;
 
@@ -112,14 +102,6 @@ public class Result {
         }
 
         /**
-         * Append {@code word} to the matched content.
-         * @param word Input word
-         */
-        void append(String word) {
-            super.append(word);
-        }
-
-        /**
          * @return Part of phrase that matched
          */
         String getToken() {
@@ -133,7 +115,7 @@ public class Result {
     /**
      * Container object for matches
      */
-    public Result() {}
+    Result() {}
 
     /**
      * Add match entry.
@@ -152,8 +134,7 @@ public class Result {
     /**
      * @return List of match entries
      */
-
-    public LinkedList<Phrase> getEntries() {
+    LinkedList<Phrase> getEntries() {
         return _entries;
     }
 
@@ -171,10 +152,19 @@ public class Result {
     /**
      * @return Part of phrase that matched
      */
-    public List<String> getPhrase() throws Exception{
-        return _entries.getFirst().getPhrase(); }
+    List<String> getPhrase() {
 
-    public Placeholder getPlaceholder() throws Exception { return _entries.getFirst().getPlaceholder(); }
+        return _entries.getFirst().getPhrase();
+    }
+
+    /**
+     * TODO only single placeholder per match at the moment
+     * @return Placeholder object
+     */
+    Placeholder getPlaceholder() {
+
+        return _entries.getFirst().getPlaceholder();
+    }
 
     /**
      * Append {}@code word} to current placeholder.
@@ -191,5 +181,22 @@ public class Result {
     void resetPlaceholder() {
 
         _tmpPlaceholder = null;
+    }
+
+    /**
+     * Extract match details into hashmaps.
+     * @param matches Map of Phrase : avgProbability
+     * @param placeholders Map of Placeholder : Phrase or null
+     */
+    void extractMatches(HashMap<List<String>, Double>   matches,
+                        HashMap<String, List<String>>   placeholders) {
+
+        for (Phrase phrase : _entries) {
+            matches.put(phrase.getPhrase(), phrase.getAvgProbability());
+            Placeholder placeholder = phrase.getPlaceholder();
+            if (placeholders != null && placeholder != null) {
+                placeholders.put(placeholder.getToken(), placeholder.getPhrase());
+            }
+        }
     }
 }

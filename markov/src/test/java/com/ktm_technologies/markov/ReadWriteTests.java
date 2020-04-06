@@ -84,6 +84,14 @@ public class ReadWriteTests {
     }
 
     @Test
+    public void writeMunderfingDot() throws Exception {
+
+        MarkovChain mc = MarkovChainTest.createMunderfingChainW1();
+        DotWriter writer = new DotWriter("Fish", new PrintStream(System.out));
+        mc.traverse(writer);
+    }
+
+    @Test
     public void writeFooBarBazJson() throws Exception {
 
         MarkovChain mc = MarkovChainTest.createFooBarBazChain();

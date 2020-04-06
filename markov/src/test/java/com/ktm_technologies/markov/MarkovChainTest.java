@@ -20,8 +20,10 @@ package com.ktm_technologies.markov;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -152,6 +154,22 @@ public class MarkovChainTest {
         assertArrayEquals(entry.getPhrase().toArray(), new String[] {"c", "d", "e"});
         assertEquals(entry.getAvgProbability(), 1.0, 0.0001);
         assertEquals(entry.getOffset(), 2);
+    }
+
+    @Test
+    public void markov_scanDetailsPublic() {
+        MarkovChain mc = new MarkovChain(MarkovChainTest._WINDOW);
+        List<String> model = new LinkedList<>(Arrays.asList("a", "b", "c", "d", "e", "f"));
+        List<String> phrase = new LinkedList<>(Arrays.asList("x", "y", "c", "d", "e", "z"));
+        Result details = new Result();
+        mc.train(model);
+        HashMap<List<String>, Double> matches = new HashMap<>();
+        mc.scan(phrase, matches, null);
+        for (Map.Entry<List<String>, Double> entry : matches.entrySet()) {
+            assertArrayEquals(entry.getKey().toArray(), new String[] {"c", "d", "e"});
+            assertEquals(entry.getValue(), 1.0, 0.0001);
+            break;
+        }
     }
 
     @Test
@@ -313,6 +331,17 @@ public class MarkovChainTest {
     private static MarkovChain createPlaceholderMidChainW2() {
         MarkovChain mc = new MarkovChain(2);
         List<String> phrase = new LinkedList<>(Arrays.asList("füge wegpunkt in <location> zusätzlich ein".split( " ")));
+        mc.train(phrase);
+        return mc;
+    }
+
+    static MarkovChain createMunderfingChainW1() {
+        MarkovChain mc = new MarkovChain(1);
+        List<String> phrase = new LinkedList<>(Arrays.asList("Wegpunkt in Munderfing erstellen".split( " ")));
+        mc.train(phrase);
+        phrase = new LinkedList<>(Arrays.asList("Erstelle Route nach Munderfing".split( " ")));
+        mc.train(phrase);
+        phrase = new LinkedList<>(Arrays.asList("Navigation nach Munderfing starten".split( " ")));
         mc.train(phrase);
         return mc;
     }

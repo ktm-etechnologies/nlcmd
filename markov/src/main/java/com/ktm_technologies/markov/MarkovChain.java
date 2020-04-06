@@ -25,7 +25,6 @@ import org.json.JSONObject;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -700,10 +699,34 @@ public class MarkovChain {
      * @param phrase Match phrase
      * @return Average probability: sum of probabilities / number of edges for the best matching sub-phrase
      */
-    public double scan(List<String>     phrase,
-                       Result details){
+    public double scan(List<String>                     phrase,
+                       HashMap<List<String>, Double>    matches,
+                       HashMap<String, List<String>>    placeholders) {
 
-        // A phrase needs to be longer than the sliding window, otherwise there are no edges
+        Result details = new Result();
+        double ret = scan(phrase, details);
+        details.extractMatches(matches, placeholders);
+
+        return ret;
+    }
+
+    /**
+     * Scan phrase and match sub-phrases against markov chain.
+     *
+     * A phrase needs to be longer than the sliding window, otherwise there are no edges.
+     *
+     * Every node in the chain can be a start node. Partial matches are always attempted --
+     * if the first word of a phrase doesn't match, next ones are tried. Only the first matching
+     * sub-phrase is tested, after the match breaks, no further attempts to match later
+     * sub-phrases are made.
+     *
+     * @param phrase Match phrase
+     * @return Average probability: sum of probabilities / number of edges for the best matching sub-phrase
+     */
+    double scan(List<String>    phrase,
+                Result          details){
+
+            // A phrase needs to be longer than the sliding window, otherwise there are no edges
         if (phrase.size() < _window + 1) {
             return -1.0;
         }
@@ -728,8 +751,8 @@ public class MarkovChain {
             }
         } while (avgProbability > 0);
 
-        return avgProbabilityMax;    }
-
+        return avgProbabilityMax;
+    }
 
     /**
      * Walk the entire markov chain.
@@ -816,7 +839,3 @@ public class MarkovChain {
         return true;
     }
 }
-
-/**
- * Used to capture statistics when querying the markov chain.
- */
