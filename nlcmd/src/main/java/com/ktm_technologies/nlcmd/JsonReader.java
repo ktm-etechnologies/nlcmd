@@ -1,4 +1,4 @@
-package com.ktm_technologies.markov;
+package com.ktm_technologies.nlcmd;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

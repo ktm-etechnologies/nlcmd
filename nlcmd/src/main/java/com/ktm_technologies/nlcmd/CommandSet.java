@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ktm_technologies.markov;
+package com.ktm_technologies.nlcmd;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * Represents a set of commands, with each command being represented by a
- * {@link com.ktm_technologies.markov.MarkovChain}.
+ * {@link MarkovChain}.
  */
 public class CommandSet extends HashMap<String, MarkovChain> {
 
@@ -32,7 +32,7 @@ public class CommandSet extends HashMap<String, MarkovChain> {
      * Create CommandSet object
      *
      * @param window Window size for markov chains created via the
-     * {@link com.ktm_technologies.markov.CommandSet#put(String, String[])} method.
+     * {@link CommandSet#put(String, String[])} method.
      *
      * @throws ArrayIndexOutOfBoundsException If window < 1
      */
@@ -72,7 +72,7 @@ public class CommandSet extends HashMap<String, MarkovChain> {
 
         double maxAvgProbability = -1;
         String key = null;
-        for (CommandSet.Entry<String, MarkovChain> entry : this.entrySet()) {
+        for (Entry<String, MarkovChain> entry : this.entrySet()) {
 
             double avgProbability = entry.getValue().match(phrase);
             if (avgProbability > maxAvgProbability) {
@@ -100,7 +100,7 @@ public class CommandSet extends HashMap<String, MarkovChain> {
         double maxAvgProbability = -1;
         String key = null;
 
-        for (CommandSet.Entry<String, MarkovChain> entry : this.entrySet()) {
+        for (Entry<String, MarkovChain> entry : this.entrySet()) {
 
             HashMap<List<String>, Double> matches_ = new HashMap<>();
             HashMap<String, List<String>> placeholders_ = new HashMap<>();

@@ -1,4 +1,4 @@
-package com.ktm_technologies.markov;
+package com.ktm_technologies.nlcmd;
 
 import java.util.HashMap;
 import java.util.LinkedList;

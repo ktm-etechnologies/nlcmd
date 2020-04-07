@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ktm_technologies.markov;
+package com.ktm_technologies.nlcmd;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -112,7 +112,6 @@ class Label {
 }
 
 
-
 /**
  * Represents edge to {@link Node} in the chain.
  */
@@ -171,7 +170,6 @@ class Edge {
 }
 
 
-
 /**
  * For temporary edge objects during placeholder matching.
  */
@@ -185,7 +183,6 @@ class ReflexiveEdge extends Edge {
         super(node, 1.0);
     }
 }
-
 
 
 /**
@@ -349,7 +346,6 @@ class Node {
 }
 
 
-
 /**
  * Represents a sliding window over a phrase.
  */
@@ -448,11 +444,10 @@ interface Stream {
      * @param labelFragments Target node label
      */
     @SuppressWarnings("RedundantThrows")
-    void addEdge(double     probability,
-                 String[]   labelFragments)
+    void addEdge(double probability,
+                 String[] labelFragments)
         throws Exception;
 }
-
 
 
 /**

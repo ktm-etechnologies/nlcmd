@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ktm_technologies.markov;
+package com.ktm_technologies.nlcmd;
 
 import org.junit.Test;
 

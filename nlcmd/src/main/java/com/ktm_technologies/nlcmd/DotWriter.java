@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ktm_technologies.markov;
+package com.ktm_technologies.nlcmd;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
