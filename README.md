@@ -13,5 +13,6 @@ Features include
 * Support for creating [Graphviz Dot](https://www.graphviz.org) representations
   of models for visualization and debugging
 
-The code is in proof-of-concept stage and feedback is welcome. For a snapshot
-of the documentation please refer to https://ktm-technologies.github.io/markov-phrase-matching-android-doc/
+The code is in proof-of-concept stage and feedback is welcome. 
+* Github page: https://ktm-technologies.github.io/markov-phrase-matching-android
+* API reference snapshot: https://ktm-technologies.github.io/markov-phrase-matching-android-doc/
