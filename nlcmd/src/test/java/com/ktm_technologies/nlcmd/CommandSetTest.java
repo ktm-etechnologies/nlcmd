@@ -95,55 +95,55 @@ public class CommandSetTest {
 
     private static MarkovChain createDestinationChainW2() {
         MarkovChain mc = new MarkovChain(_WINDOW);
-        Object[] phrases = {
-                new LinkedList<>(Arrays.asList("set destination <location>".split(" "))),
-                new LinkedList<>(Arrays.asList("set <location> as destination".split(" "))),
-                new LinkedList<>(Arrays.asList("set route to <location>".split(" "))),
-                new LinkedList<>(Arrays.asList("go to <location>".split(" "))),
-                new LinkedList<>(Arrays.asList("navigate to <location>".split(" "))),
-                new LinkedList<>(Arrays.asList("load route to <location>".split(" ")))
-        };
-        for (Object phrase : phrases) {
-            mc.train((List<String>) phrase);
+        List<List<String>> phrases = new LinkedList<>();
+        phrases.add(Arrays.asList("set destination <location>".split(" ")));
+        phrases.add(Arrays.asList("set <location> as destination".split(" ")));
+        phrases.add(Arrays.asList("set route to <location>".split(" ")));
+        phrases.add(Arrays.asList("go to <location>".split(" ")));
+        phrases.add(Arrays.asList("navigate to <location>".split(" ")));
+        phrases.add(Arrays.asList("load route to <location>".split(" ")));
+
+        for (List<String> phrase : phrases) {
+            mc.train(phrase);
         }
         return mc;
     }
 
     private static MarkovChain createWaypointChainW2() {
         MarkovChain mc = new MarkovChain(_WINDOW);
-        Object[] phrases = {
-                new LinkedList<>(Arrays.asList("set waypoint in <location>".split(" "))),
-                new LinkedList<>(Arrays.asList("add waypoint in <location>".split(" "))),
-                new LinkedList<>(Arrays.asList("set <location> as waypoint".split(" "))),
-                new LinkedList<>(Arrays.asList("go via <location>".split(" "))),
-                new LinkedList<>(Arrays.asList("navigate via <location>".split(" "))),
-                new LinkedList<>(Arrays.asList("add detour via <location>".split(" "))),
-                new LinkedList<>(Arrays.asList("change route to go via <location>".split(" ")))
-        };
-        for (Object phrase : phrases) {
-            mc.train((List<String>) phrase);
+        List<List<String>> phrases = new LinkedList<>();
+        phrases.add(Arrays.asList("set waypoint in <location>".split(" ")));
+        phrases.add(Arrays.asList("add waypoint in <location>".split(" ")));
+        phrases.add(Arrays.asList("set <location> as waypoint".split(" ")));
+        phrases.add(Arrays.asList("go via <location>".split(" ")));
+        phrases.add(Arrays.asList("navigate via <location>".split(" ")));
+        phrases.add(Arrays.asList("add detour via <location>".split(" ")));
+        phrases.add(Arrays.asList("change route to go via <location>".split(" ")));
+
+        for (List<String> phrase : phrases) {
+            mc.train(phrase);
         }
         return mc;
     }
 
     private static MarkovChain createSkipWaypointChainW2() {
         MarkovChain mc = new MarkovChain(_WINDOW);
-        Object[] phrases = {
-                new LinkedList<>(Arrays.asList("delete next waypoint".split(" "))),
-                new LinkedList<>(Arrays.asList("delete waypoint in <location>".split(" "))),
-                new LinkedList<>(Arrays.asList("delete upcoming waypoint".split(" "))),
-                new LinkedList<>(Arrays.asList("ignore next waypoint".split(" "))),
-                new LinkedList<>(Arrays.asList("ignore waypoint in <location>".split(" "))),
-                new LinkedList<>(Arrays.asList("ignore upcoming waypoint".split(" "))),
-                new LinkedList<>(Arrays.asList("remove next waypoint".split(" "))),
-                new LinkedList<>(Arrays.asList("remove waypoint in <location>".split(" "))),
-                new LinkedList<>(Arrays.asList("remove upcoming waypoint".split(" "))),
-                new LinkedList<>(Arrays.asList("skip next waypoint".split(" "))),
-                new LinkedList<>(Arrays.asList("skip waypoint in <location>".split(" "))),
-                new LinkedList<>(Arrays.asList("skip upcoming waypoint".split(" ")))
-        };
-        for (Object phrase : phrases) {
-            mc.train((List<String>) phrase);
+        List<List<String>> phrases = new LinkedList<>();
+        phrases.add(Arrays.asList("delete next waypoint".split(" ")));
+        phrases.add(Arrays.asList("delete waypoint in <location>".split(" ")));
+        phrases.add(Arrays.asList("delete upcoming waypoint".split(" ")));
+        phrases.add(Arrays.asList("ignore next waypoint".split(" ")));
+        phrases.add(Arrays.asList("ignore waypoint in <location>".split(" ")));
+        phrases.add(Arrays.asList("ignore upcoming waypoint".split(" ")));
+        phrases.add(Arrays.asList("remove next waypoint".split(" ")));
+        phrases.add(Arrays.asList("remove waypoint in <location>".split(" ")));
+        phrases.add(Arrays.asList("remove upcoming waypoint".split(" ")));
+        phrases.add(Arrays.asList("skip next waypoint".split(" ")));
+        phrases.add(Arrays.asList("skip waypoint in <location>".split(" ")));
+        phrases.add(Arrays.asList("skip upcoming waypoint".split(" ")));
+
+        for (List<String> phrase : phrases) {
+            mc.train(phrase);
         }
         return mc;
     }
