@@ -1,1 +1,1 @@
-include ':app', ':markov', ':nlcmd'
+include ':app', ':nlcmd'
