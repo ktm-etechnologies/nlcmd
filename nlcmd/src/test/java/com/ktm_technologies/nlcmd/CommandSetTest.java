@@ -16,7 +16,6 @@
 
 package com.ktm_technologies.nlcmd;
 
-
 import org.junit.Test;
 
 import java.util.Arrays;
