@@ -14,5 +14,5 @@ Features include
   of models for visualization and debugging
 
 The code is in proof-of-concept stage and feedback is welcome. 
-* Github page: https://ktm-technologies.github.io/markov-phrase-matching-android
-* API reference snapshot: https://ktm-technologies.github.io/markov-phrase-matching-android-doc/
+* Github page: https://github.com/ktm-technologies/markov-phrase-matching-android/
+* API reference: https://ktm-technologies.github.io/markov-phrase-matching-android-doc/
