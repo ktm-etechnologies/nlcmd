@@ -4,11 +4,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 class Result {
 
     /**
      * Abstract baseclass for phrase- and placeholder matches.
      */
+    @SuppressWarnings("SpellCheckingInspection")
     abstract class Match {
 
         private final int       _offset;
@@ -152,6 +154,7 @@ class Result {
     /**
      * @return Part of phrase that matched
      */
+    @SuppressWarnings("unused")
     List<String> getPhrase() {
 
         return _entries.getFirst().getPhrase();

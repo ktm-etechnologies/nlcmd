@@ -28,7 +28,7 @@ import java.io.InputStream;
 public class JsonReader {
 
     /**
-     * Rread a markov model from JSON data.
+     * Read a markov model from JSON data.
      * @param in JSON data stream
      * @return The reconstructed {@link com.ktm_technologies.nlcmd.MarkovChain}.
      * @throws Exception In case reading, parsing or constructing the markov chain fails.

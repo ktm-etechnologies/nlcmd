@@ -475,7 +475,7 @@ public class MarkovChain {
     private final ArrayList<List<String>> phraseList=new ArrayList<>();
 
     public double matchingFaktor(List<String> resultingPhrase){
-        double faktor=0;
+        double faktor;
         double tempCount=0;
         int tempN=0;
         for(int n=0;n<phraseList.size();n++){
