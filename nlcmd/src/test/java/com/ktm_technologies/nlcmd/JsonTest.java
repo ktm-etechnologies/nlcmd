@@ -14,7 +14,6 @@ import static org.junit.Assert.*;
 
 public class JsonTest {
 
-    @Ignore("TODO Test is disabled for failure")
     @Test
     public void writeFooBarBazJson() throws Exception {
 
@@ -23,7 +22,6 @@ public class JsonTest {
         mc.traverse(writer);
     }
 
-    @Ignore("TODO Test is disabled for failure")
     @Test
     public void writeFishJsonW1() throws Exception {
 
@@ -32,7 +30,6 @@ public class JsonTest {
         mc.traverse(writer);
     }
 
-    @Ignore("TODO Test is disabled for failure")
     @Test
     public void roundtripJsonW1() throws Exception {
 
@@ -53,7 +50,6 @@ public class JsonTest {
         assertEquals(result1, result2, 0.0001);
     }
 
-    @Ignore("TODO Test is disabled for failure")
     @Test
     public void roundtripJsonW2() throws Exception {
 
