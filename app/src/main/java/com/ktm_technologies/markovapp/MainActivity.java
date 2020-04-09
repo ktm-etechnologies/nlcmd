@@ -13,9 +13,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.ktm_technologies.markov.DotWriter;
-import com.ktm_technologies.markov.MarkovChain;
-import com.ktm_technologies.markov.Result;
+import com.ktm_technologies.nlcmd.DotWriter;
+import com.ktm_technologies.nlcmd.MarkovChain;
 
 import java.io.PrintStream;
 import java.lang.reflect.Array;
@@ -179,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
                 double highest=0;
                 String phrases="";
                 int chain=9999;
+/* TODO move to new API
                 for(int p=0;p<markovChain.size();p++){
                     log.i("MarkovChain","Start with MarkovChain "+ p);
                     for(int x=0;x<(int)Math.pow(3,indezes.size());x++){
@@ -198,13 +198,14 @@ public class MainActivity extends AppCompatActivity {
                     }
                     log.i("HitWahrscheinlichkeit",String.valueOf(result1));
                     try{
-                    log.i("passendePhrase",Arrays.toString(ressi.getPhrase().toArray()));
+                  log.i("passendePhrase",Arrays.toString(ressi.getPhrase().toArray()));
                     }
                     catch (Exception e){
 
                     }
 
                 }}
+ */
                 tvPhrase.setText(phrases);
                 tvProb.setText(highest*100+" %\nMatched on Chain " + chain);
 
