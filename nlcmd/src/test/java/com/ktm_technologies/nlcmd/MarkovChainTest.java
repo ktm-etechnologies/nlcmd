@@ -272,7 +272,7 @@ public class MarkovChainTest {
         assertTrue(ret);
     }
 
-    static MarkovChain createFooBarBazChain() {
+    public static MarkovChain createFooBarBazChain() {
         MarkovChain mc = new MarkovChain(MarkovChainTest._WINDOW);
         List<String> phrase = new LinkedList<>(Arrays.asList("foo", "bar", "baz"));
         mc.train(phrase);
@@ -293,21 +293,21 @@ public class MarkovChainTest {
         return mc;
     }
 
-    static MarkovChain createFoxChainW1() {
+    public static MarkovChain createFoxChainW1() {
         MarkovChain mc = new MarkovChain(1);
         List<String> phrase = new LinkedList<>(Arrays.asList("the quick brown fox jumps over the lazy dog".split( " ")));
         mc.train(phrase);
         return mc;
     }
 
-    static MarkovChain createFoxChainW2() {
+    public static MarkovChain createFoxChainW2() {
         MarkovChain mc = new MarkovChain(2);
         List<String> phrase = new LinkedList<>(Arrays.asList("the quick brown fox jumps over the lazy dog".split( " ")));
         mc.train(phrase);
         return mc;
     }
 
-    static MarkovChain createFishChainW1() {
+    public static MarkovChain createFishChainW1() {
         MarkovChain mc = new MarkovChain(1);
         List<String> phrase = new LinkedList<>(Arrays.asList("one fish two fish red fish blue fish".split( " ")));
         mc.train(phrase);
