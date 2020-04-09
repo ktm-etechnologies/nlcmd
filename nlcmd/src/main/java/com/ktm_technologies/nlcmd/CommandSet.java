@@ -26,22 +26,21 @@ import java.util.List;
  */
 public class CommandSet extends HashMap<String, MarkovChain> {
 
-    private int _window;
+    private int _order;
 
     /**
      * Create CommandSet object
      *
-     * @param window Window size for markov chains created via the
-     * {@link CommandSet#put(String, String[])} method.
-     *
-     * @throws ArrayIndexOutOfBoundsException If window < 1
+     * @param order Order for markov chains created via the {@link CommandSet#put(String, String[])}
+     *              method, that is number of relevant previous steps when matching
+     * @throws ArrayIndexOutOfBoundsException If order < 1
      */
-    public CommandSet(int window) throws ArrayIndexOutOfBoundsException {
+    public CommandSet(int order) throws ArrayIndexOutOfBoundsException {
 
-        if (window < 1) {
-            throw new ArrayIndexOutOfBoundsException("MarkovChain window size can not be < 1");
+        if (order < 1) {
+            throw new ArrayIndexOutOfBoundsException("MarkovChain order size can not be < 1");
         }
-        _window = window;
+        _order = order;
     }
 
     /**
@@ -53,7 +52,7 @@ public class CommandSet extends HashMap<String, MarkovChain> {
     public void put(String      key,
                     String[]    commands) {
 
-        MarkovChain mc = new MarkovChain(_window);
+        MarkovChain mc = new MarkovChain(_order);
         for (String command : commands) {
             List<String> phrase = Arrays.asList(command.split(" "));
             mc.train(phrase);

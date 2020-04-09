@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 @SuppressWarnings("unused")
 public class CommandSetTest {
 
-    private final static int _WINDOW = 2;
+    private final static int _ORDER = 2;
 
     @Test
     public void command_train() {
@@ -48,7 +48,7 @@ public class CommandSetTest {
             "navigate to <location>",
             "load route to <location>"
         };
-        CommandSet cs = new CommandSet(_WINDOW);
+        CommandSet cs = new CommandSet(_ORDER);
         cs.put("destination", commands);
 
         List<String> phrase = Arrays.asList("load route to Munderfing".split(" "));
@@ -65,7 +65,7 @@ public class CommandSetTest {
     @Test
     public void command_matchNavigation() {
 
-        CommandSet cs = new CommandSet(_WINDOW);
+        CommandSet cs = new CommandSet(_ORDER);
         cs.put("destination", createDestinationChainW2());
         cs.put("waypoint", createWaypointChainW2());
         cs.put("skip", createSkipWaypointChainW2());
@@ -77,7 +77,7 @@ public class CommandSetTest {
     @Test
     public void command_scanNavigation() {
 
-        CommandSet cs = new CommandSet(_WINDOW);
+        CommandSet cs = new CommandSet(_ORDER);
         cs.put("destination", createDestinationChainW2());
         cs.put("waypoint", createWaypointChainW2());
         cs.put("skip", createSkipWaypointChainW2());
@@ -94,7 +94,7 @@ public class CommandSetTest {
     }
 
     private static MarkovChain createDestinationChainW2() {
-        MarkovChain mc = new MarkovChain(_WINDOW);
+        MarkovChain mc = new MarkovChain(_ORDER);
         List<List<String>> phrases = new LinkedList<>();
         phrases.add(Arrays.asList("set destination <location>".split(" ")));
         phrases.add(Arrays.asList("set <location> as destination".split(" ")));
@@ -110,7 +110,7 @@ public class CommandSetTest {
     }
 
     private static MarkovChain createWaypointChainW2() {
-        MarkovChain mc = new MarkovChain(_WINDOW);
+        MarkovChain mc = new MarkovChain(_ORDER);
         List<List<String>> phrases = new LinkedList<>();
         phrases.add(Arrays.asList("set waypoint in <location>".split(" ")));
         phrases.add(Arrays.asList("add waypoint in <location>".split(" ")));
@@ -127,7 +127,7 @@ public class CommandSetTest {
     }
 
     private static MarkovChain createSkipWaypointChainW2() {
-        MarkovChain mc = new MarkovChain(_WINDOW);
+        MarkovChain mc = new MarkovChain(_ORDER);
         List<List<String>> phrases = new LinkedList<>();
         phrases.add(Arrays.asList("delete next waypoint".split(" ")));
         phrases.add(Arrays.asList("delete waypoint in <location>".split(" ")));

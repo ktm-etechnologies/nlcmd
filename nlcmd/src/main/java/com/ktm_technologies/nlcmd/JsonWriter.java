@@ -50,7 +50,7 @@ public class JsonWriter implements Stream {
     public void startModel(int window) throws Exception {
 
         _json.put(Config.JSON_LABEL, _name);
-        _json.put(Config.JSON_WINDOW, window);
+        _json.put(Config.JSON_ORDER, window);
     }
 
     @Override

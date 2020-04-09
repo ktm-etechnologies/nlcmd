@@ -39,31 +39,31 @@ import static org.junit.Assert.assertTrue;
 @SuppressWarnings("unused")
 public class MarkovChainTest {
 
-    private final static int _WINDOW = 1;
+    private final static int _ORDER = 1;
 
     @Test
     public void markov_ctor() {
-        MarkovChain mc = new MarkovChain(MarkovChainTest._WINDOW);
+        MarkovChain mc = new MarkovChain(MarkovChainTest._ORDER);
         assertNotNull(mc);
     }
 
     @Test
     public void markov_scanEmptyEmpty() {
-        MarkovChain mc = new MarkovChain(MarkovChainTest._WINDOW);
+        MarkovChain mc = new MarkovChain(MarkovChainTest._ORDER);
         double result = mc.scan(new LinkedList<String>(), null);
         assertEquals(-1.0, result, 0.0001);
     }
 
     @Test
     public void markov_matchEmptyEmpty() {
-        MarkovChain mc = new MarkovChain(MarkovChainTest._WINDOW);
+        MarkovChain mc = new MarkovChain(MarkovChainTest._ORDER);
         double result = mc.match(new LinkedList<String>());
         assertEquals(-1.0, result, 0.0001);
     }
 
     @Test
     public void markov_matchEmptyModel() {
-        MarkovChain mc = new MarkovChain(MarkovChainTest._WINDOW);
+        MarkovChain mc = new MarkovChain(MarkovChainTest._ORDER);
         List<String> phrase = new LinkedList<>(Arrays.asList("foo", "bar"));
         double result = mc.match(phrase);
         assertEquals(0.0, result, 0.0001);
@@ -71,7 +71,7 @@ public class MarkovChainTest {
 
     @Test
     public void markov_scanEmptyModel() {
-        MarkovChain mc = new MarkovChain(MarkovChainTest._WINDOW);
+        MarkovChain mc = new MarkovChain(MarkovChainTest._ORDER);
         List<String> phrase = new LinkedList<>(Arrays.asList("foo", "bar"));
         double result = mc.scan(phrase, null);
         assertEquals(0.0, result, 0.0001);
@@ -144,7 +144,7 @@ public class MarkovChainTest {
 
     @Test
     public void markov_scanDetails() {
-        MarkovChain mc = new MarkovChain(MarkovChainTest._WINDOW);
+        MarkovChain mc = new MarkovChain(MarkovChainTest._ORDER);
         List<String> model = new LinkedList<>(Arrays.asList("a", "b", "c", "d", "e", "f"));
         List<String> phrase = new LinkedList<>(Arrays.asList("x", "y", "c", "d", "e", "z"));
         Result details = new Result();
@@ -158,7 +158,7 @@ public class MarkovChainTest {
 
     @Test
     public void markov_scanDetailsPublic() {
-        MarkovChain mc = new MarkovChain(MarkovChainTest._WINDOW);
+        MarkovChain mc = new MarkovChain(MarkovChainTest._ORDER);
         List<String> model = new LinkedList<>(Arrays.asList("a", "b", "c", "d", "e", "f"));
         List<String> phrase = new LinkedList<>(Arrays.asList("x", "y", "c", "d", "e", "z"));
         Result details = new Result();
@@ -174,7 +174,7 @@ public class MarkovChainTest {
 
     @Test
     public void markov_scanSubPhrases() {
-        MarkovChain mc = new MarkovChain(MarkovChainTest._WINDOW);
+        MarkovChain mc = new MarkovChain(MarkovChainTest._ORDER);
         List<String> model = new LinkedList<>(Arrays.asList("a", "b", "c", "d", "e", "f", "g", "h"));
         List<String> match = new LinkedList<>(Arrays.asList("x", "b", "c", "y", "d", "e", "f", "z"));
         Result details = new Result();
@@ -273,7 +273,7 @@ public class MarkovChainTest {
     }
 
     public static MarkovChain createFooBarBazChain() {
-        MarkovChain mc = new MarkovChain(MarkovChainTest._WINDOW);
+        MarkovChain mc = new MarkovChain(MarkovChainTest._ORDER);
         List<String> phrase = new LinkedList<>(Arrays.asList("foo", "bar", "baz"));
         mc.train(phrase);
         return mc;
@@ -281,7 +281,7 @@ public class MarkovChainTest {
 
     @SuppressWarnings("unchecked")
     static MarkovChain createDiamondChain() {
-        MarkovChain mc = new MarkovChain(MarkovChainTest._WINDOW);
+        MarkovChain mc = new MarkovChain(MarkovChainTest._ORDER);
         Object[] phrases = {
                 new LinkedList<>(Arrays.asList("a", "b", "c")),
                 new LinkedList<>(Arrays.asList("a", "d", "c")),

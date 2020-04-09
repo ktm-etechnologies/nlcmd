@@ -458,7 +458,7 @@ class Config {
     final static Charset CHARSET = Charset.forName("UTF-8");
 
     final static String JSON_LABEL = "label";
-    final static String JSON_WINDOW = "window";
+    final static String JSON_ORDER = "order";
     final static String JSON_EDGES = "edges";
     final static String JSON_FROM = "from";
     final static String JSON_TO = "to";
@@ -471,7 +471,7 @@ class Config {
 public class MarkovChain {
 
     private final HashMap<Label, Node>  _nodes = new HashMap<>();
-    private final int                   _window;
+    private final int                   _order;
     private final ArrayList<List<String>> phraseList=new ArrayList<>();
 
     public double matchingFaktor(List<String> resultingPhrase){
@@ -506,18 +506,18 @@ public class MarkovChain {
     }
     /**
      * Create MarkovChain object.
-     * @param window Window size
+     * @param order Markov chain order, that is number of relevant previous steps when matching
      */
-    public MarkovChain(int window) {
-        _window = window;
+    public MarkovChain(int order) {
+        _order = order;
     }
 
     /**
-     * @return Window size
+     * @return Markov chain order, that is number of relevant previous steps when matching
      */
     @SuppressWarnings("unused")
-    public int getWindow() {
-        return _window;
+    public int getOrder() {
+        return _order;
     }
 
     /**
@@ -560,11 +560,11 @@ public class MarkovChain {
      */
     public void train(List<String> phrase) {
 
-        if (phrase.size() <= _window) {
+        if (phrase.size() <= _order) {
             return;
         }
         phraseList.add(phrase);
-        SlidingWindow sw = new SlidingWindow(phrase, _window);
+        SlidingWindow sw = new SlidingWindow(phrase, _order);
         Label label = sw.slide();
         Node root = _nodes.get(label);
         if (root == null) {
@@ -603,7 +603,7 @@ public class MarkovChain {
         Result details;
 
         // A phrase needs to be longer than the sliding window, otherwise there are no edges
-        if (phrase.size() < _window + 1) {
+        if (phrase.size() < _order + 1) {
             return -1.0;
         }
 
@@ -641,12 +641,12 @@ public class MarkovChain {
         double sumProbabilities = 0.0;
 
         // A phrase needs to be longer than the sliding window, otherwise there are no edges
-        if (phrase.size() < _window + 1) {
+        if (phrase.size() < _order + 1) {
             return -1.0;
         }
 
         // Find first matching node
-        SlidingWindow sw = new SlidingWindow(phrase, _window);
+        SlidingWindow sw = new SlidingWindow(phrase, _order);
         while (sw.canSlide()) {
             Label label = sw.slide();
             node = _nodes.get(label);
@@ -675,7 +675,7 @@ public class MarkovChain {
 
         // Capture details
         double avgProbability = sumProbabilities /nEdges ;
-        List<String> subPhrase = phrase.subList(offset, offset + nEdges + _window);
+        List<String> subPhrase = phrase.subList(offset, offset + nEdges + _order);
         details.append(subPhrase, phraseOffset + offset, avgProbability);
 
         return avgProbability;
@@ -722,7 +722,7 @@ public class MarkovChain {
                 Result          details){
 
             // A phrase needs to be longer than the sliding window, otherwise there are no edges
-        if (phrase.size() < _window + 1) {
+        if (phrase.size() < _order + 1) {
             return -1.0;
         }
 
@@ -756,7 +756,7 @@ public class MarkovChain {
     public void traverse(Stream listener) throws Exception {
 
         // Visit all nodes
-        listener.startModel(_window);
+        listener.startModel(_order);
         for (Map.Entry<Label, Node> nodeEntry : _nodes.entrySet()) {
 
             Node n = nodeEntry.getValue();

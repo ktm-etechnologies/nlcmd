@@ -50,7 +50,7 @@ public class JsonReader {
         int window;
         model = new JSONObject(content);
         edges = model.optJSONArray(Config.JSON_EDGES);
-        window = model.optInt(Config.JSON_WINDOW, -1);
+        window = model.optInt(Config.JSON_ORDER, -1);
         if (window == -1 || edges == null) {
             throw new IllegalArgumentException();
         }
