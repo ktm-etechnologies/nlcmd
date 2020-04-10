@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 29
@@ -34,4 +35,45 @@ dependencies {
     testImplementation 'org.json:json:20190722'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+}
+
+def githubProperties = new Properties()
+githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
+
+def getVersionName = { ->
+    return "0.4.0"
+}
+
+def getArtifactId = { ->
+    return "nlcmd"
+}
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId 'com.ktm-technologies'
+            artifactId getArtifactId()
+            version getVersionName()
+            artifact("$buildDir/outputs/aar/${getArtifactId()}-release.aar")
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GithubPackages"
+            /** Configure path of your package repository on Github
+             ** Replace GITHUB_USERID with your/organisation Github userID
+             ** and REPOSITORY with the repository name on GitHub
+             */
+            url = uri("https://maven.pkg.github.com/r0b5t4/nlcmd")
+            credentials {
+                /** Create github.properties in root project folder file with
+                 ** gpr.usr=GITHUB_USER_ID & gpr.key=PERSONAL_ACCESS_TOKEN
+                 ** Set env variable GPR_USER & GPR_API_KEY if not adding a properties file**/
+
+                username = githubProperties['gpr.usr'] ?: System.getenv("GPR_USER")
+                password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")
+            }
+        }
+    }
 }
