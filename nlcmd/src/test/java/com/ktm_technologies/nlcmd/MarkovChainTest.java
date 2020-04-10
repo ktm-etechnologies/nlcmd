@@ -64,7 +64,7 @@ public class MarkovChainTest {
     @Test
     public void markov_matchEmptyModel() {
         MarkovChain mc = new MarkovChain(MarkovChainTest._ORDER);
-        List<String> phrase = new LinkedList<>(Arrays.asList("foo", "bar"));
+        List<String> phrase = Arrays.asList("foo", "bar");
         double result = mc.match(phrase);
         assertEquals(0.0, result, 0.0001);
     }
@@ -72,7 +72,7 @@ public class MarkovChainTest {
     @Test
     public void markov_scanEmptyModel() {
         MarkovChain mc = new MarkovChain(MarkovChainTest._ORDER);
-        List<String> phrase = new LinkedList<>(Arrays.asList("foo", "bar"));
+        List<String> phrase = Arrays.asList("foo", "bar");
         double result = mc.scan(phrase, null);
         assertEquals(0.0, result, 0.0001);
     }
