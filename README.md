@@ -1,4 +1,4 @@
-# KTM Technologies nlcmd -- A natural language phrase matching library for Android
+# KTM Technologies nlcmd -- a natural language phrase matching library for Android
 
 ![Android CI](https://github.com/ktm-technologies/markov-phrase-matching-android/workflows/Android%20CI/badge.svg)
 
