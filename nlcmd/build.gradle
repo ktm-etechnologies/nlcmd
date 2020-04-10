@@ -37,18 +37,19 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
 
-def githubProperties = new Properties()
-githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
-
-def getVersionName = { ->
-    return "0.4.0"
-}
-
-def getArtifactId = { ->
-    return "nlcmd"
-}
-
 publishing {
+
+    def githubProperties = new Properties()
+    githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
+
+    def getVersionName = { ->
+        return "0.4.0"
+    }
+
+    def getArtifactId = { ->
+        return "nlcmd"
+    }
+
     publications {
         release(MavenPublication) {
             groupId 'com.ktm-technologies'
