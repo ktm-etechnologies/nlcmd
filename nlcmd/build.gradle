@@ -39,11 +39,14 @@ dependencies {
 
 publishing {
 
+    def githubPropertiesFile = new File("github.properties")
     def githubProperties = new Properties()
-    githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
+    if (githubPropertiesFile.exists()) {
+        githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
+    }
 
     def getVersionName = { ->
-        return "0.4.0"
+        return "0.4.1"
     }
 
     def getArtifactId = { ->
