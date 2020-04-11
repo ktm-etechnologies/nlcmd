@@ -18,3 +18,5 @@ Features include
 The code is in proof-of-concept stage and feedback is welcome. 
 * Github page: https://github.com/ktm-technologies/markov-phrase-matching-android/
 * API reference: https://ktm-technologies.github.io/markov-phrase-matching-android-doc/
+
+Proudly supported by KTM Technologies GmbH
