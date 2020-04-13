@@ -449,6 +449,21 @@ interface Stream {
         throws Exception;
 }
 
+/**
+ * Class for creating nodes, can be overridden to create custom Node subclasses.
+ */
+class NodeFactory {
+
+    /**
+     * Create Node instance
+     * @param label Label asocciated to the node
+     * @return New Node instance
+     */
+    Node create(Label label) {
+
+        return new Node(label);
+    }
+}
 
 /**
  * Static configuration constants.
@@ -473,6 +488,7 @@ public class MarkovChain {
     private final HashMap<Label, Node>  _nodes = new HashMap<>();
     private final int                   _order;
     private final ArrayList<List<String>> phraseList=new ArrayList<>();
+    private NodeFactory                 _nodeFactory;
 
     public double matchingFaktor(List<String> resultingPhrase){
         double faktor;
@@ -509,7 +525,9 @@ public class MarkovChain {
      * @param order Markov chain order, that is number of relevant previous steps when matching
      */
     public MarkovChain(int order) {
+
         _order = order;
+        setNodeFactory(null);
     }
 
     /**
@@ -518,6 +536,19 @@ public class MarkovChain {
     @SuppressWarnings("unused")
     public int getOrder() {
         return _order;
+    }
+
+    /**
+     * Set custom node factory.
+     * @param factory Node factory instance or NULL to reset to default
+     */
+    public void setNodeFactory(NodeFactory factory) {
+
+        if (factory == null) {
+            _nodeFactory = new NodeFactory();
+        } else {
+            _nodeFactory = factory;
+        }
     }
 
     /**
@@ -537,12 +568,12 @@ public class MarkovChain {
 
             Node n1 = _nodes.get(l1);
             if (null == n1) {
-                n1 = new Node(l1);
+                n1 = _nodeFactory.create(l1);
                 _nodes.put(n1.getLabel(), n1);
             }
             Node n2 = _nodes.get(l2);
             if (null == n2) {
-                n2 = new Node(l2);
+                n2 = _nodeFactory.create(l2);
                 _nodes.put(n2.getLabel(), n2);
             }
 
@@ -568,7 +599,7 @@ public class MarkovChain {
         Label label = sw.slide();
         Node root = _nodes.get(label);
         if (root == null) {
-            root = new Node(label);
+            root = _nodeFactory.create(label);
             _nodes.put(root.getLabel(), root);
         }
 
@@ -578,7 +609,7 @@ public class MarkovChain {
             Label l2 = sw.slide();
             Node n2 = _nodes.get(l2);
             if (n2 == null) {
-                n2 = new Node(l2);
+                n2 = _nodeFactory.create(l2);
                 _nodes.put(n2.getLabel(), n2);
             }
             n1.addEdge(n2);
@@ -773,6 +804,8 @@ public class MarkovChain {
         }
         listener.endModel();
     }
+
+
 
     /**
      * Create Label object from JSON string array
