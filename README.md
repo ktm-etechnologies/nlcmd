@@ -17,4 +17,4 @@ Features include
 
 The code is in proof-of-concept stage and feedback is welcome. 
 * Github page: https://github.com/ktm-technologies/nlcmd/
-* API reference: https://ktm-technologies.github.io/markov-phrase-matching-android-doc/
+* API reference: https://ktm-technologies.github.io/nlcmd/doc/
