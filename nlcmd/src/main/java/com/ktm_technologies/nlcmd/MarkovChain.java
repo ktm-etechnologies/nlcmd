@@ -209,6 +209,14 @@ class Node {
     }
 
     /**
+     * Associate this node with a training phrase.
+     * Not used in the default implementation.
+     * @param phrase Training phrase
+     * @param offset Offset of node in training phrase
+     */
+    void associate(List<String> phrase, int offset) {}
+
+    /**
      * @return Edges associated to the node
      */
     HashMap<Label, Edge> getEdges() {
@@ -353,6 +361,7 @@ class SlidingWindow {
 
     private final List<String>  _phrase;
     private final int           _size;
+    private int                 _offset;
 
     /**
      * Create SlidingWindow object.
@@ -363,6 +372,7 @@ class SlidingWindow {
                    int              size) {
         _phrase = new LinkedList<>(phrase);
         _size = size;
+        _offset = -1;
     }
 
     /**
@@ -371,6 +381,12 @@ class SlidingWindow {
     boolean canSlide() {
         return _phrase.size() >= _size;
     }
+
+    /**
+     * @return Offset of window in current phrase,
+     *         will be < 0 before first invocation of SlidingWindow#slide()
+     */
+    int getOffset() { return _offset; }
 
     /**
      * Slide window to next position.
@@ -388,6 +404,7 @@ class SlidingWindow {
         }
 
         _phrase.remove(0);
+        _offset++;
 
         return new Label(fragments);
     }
@@ -602,6 +619,7 @@ public class MarkovChain {
             root = _nodeFactory.create(label);
             _nodes.put(root.getLabel(), root);
         }
+        root.associate(phrase, sw.getOffset());
 
         Node n1 = root;
         while (sw.canSlide()) {
@@ -612,6 +630,7 @@ public class MarkovChain {
                 n2 = _nodeFactory.create(l2);
                 _nodes.put(n2.getLabel(), n2);
             }
+            n2.associate(phrase, sw.getOffset());
             n1.addEdge(n2);
             n1 = n2;
         }
