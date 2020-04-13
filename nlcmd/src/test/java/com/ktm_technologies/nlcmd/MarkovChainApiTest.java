@@ -28,17 +28,18 @@ import static org.junit.Assert.assertTrue;
 public class MarkovChainApiTest {
 
     private final static int    _ORDER = 1;
-    private boolean             _matchSingle_NodeCreated;
+    private boolean             _createNodeFactory_NodeCreated;
+    private TestNode            _createNodeSubclass_TestNode;
 
     @Test
     public void markov_createNodeFactory() {
 
-        _matchSingle_NodeCreated = false;
+        _createNodeFactory_NodeCreated = false;
 
         MarkovChain mc = new MarkovChain(_ORDER);
         mc.setNodeFactory(new NodeFactory() {
             Node create(Label label) {
-                _matchSingle_NodeCreated = true;
+                _createNodeFactory_NodeCreated = true;
                 return new Node(label) {};
             }
         });
@@ -48,6 +49,47 @@ public class MarkovChainApiTest {
         List<String> phrase = new LinkedList<>(Arrays.asList("foo", "bar", "baz"));
         double result = mc.match(phrase);
         assertEquals(1.0, result, 0.0001);
-        assertTrue(_matchSingle_NodeCreated);
+        assertTrue(_createNodeFactory_NodeCreated);
+    }
+
+    @Test
+    public void markov_createNodeSubclass() {
+
+        _createNodeSubclass_TestNode = null;
+
+        MarkovChain mc = new MarkovChain(_ORDER);
+        mc.setNodeFactory(new NodeFactory() {
+            Node create(Label label) {
+                _createNodeSubclass_TestNode = new TestNode(label);
+                return _createNodeSubclass_TestNode;
+            }
+        });
+        List<String> train = new LinkedList<>(Arrays.asList("foo", "bar", "baz"));
+        mc.train(train);
+
+        List<String> phrase = new LinkedList<>(Arrays.asList("foo", "bar", "baz"));
+        double result = mc.match(phrase);
+        assertEquals(train.hashCode(), phrase.hashCode());
+        assertEquals(_createNodeSubclass_TestNode.getPhraseHash(), phrase.hashCode());
+        assertEquals(_createNodeSubclass_TestNode.getOffset(), 2);
+    }
+
+    class TestNode extends Node {
+
+        int _phraseHash;
+        int _offset;
+
+        TestNode(Label label) {
+            super(label);
+        }
+
+        void associate(List<String> phrase, int offset) {
+            _phraseHash = phrase.hashCode();
+            _offset = offset;
+        }
+
+        int getPhraseHash() { return _phraseHash; }
+
+        int getOffset() { return _offset; }
     }
 }
