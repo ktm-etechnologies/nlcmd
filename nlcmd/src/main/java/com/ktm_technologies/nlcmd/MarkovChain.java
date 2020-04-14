@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 
 /**
  * Represents a node label
@@ -469,7 +470,9 @@ interface Stream {
 /**
  * Class for creating nodes, can be overridden to create custom Node subclasses.
  */
-class NodeFactory {
+class MarkovChainMixin {
+
+    private Random  _random = new Random();
 
     /**
      * Create Node instance
@@ -479,6 +482,35 @@ class NodeFactory {
     Node create(Label label) {
 
         return new Node(label);
+    }
+
+    /**
+     * Initialize new query.
+     * @param phrase Query phrase
+     * @return Unique ID for the new query
+     */
+    int initQuery(List<String> phrase) {
+
+        return _random.nextInt();
+    }
+
+    /**
+     * Individual query step.
+     * @param id Unique query ID
+     * @param node Node that is queried
+     * @param label Edge label to query for
+     * @return Next node or NULL
+     */
+    void updateQuery(int id, Node node, Label label) {
+
+    }
+
+    /**
+     * Complete the query
+     * @param id Unique query ID
+     */
+    void finishQuery(int id) {
+
     }
 }
 
@@ -505,7 +537,7 @@ public class MarkovChain {
     private final HashMap<Label, Node>  _nodes = new HashMap<>();
     private final int                   _order;
     private final ArrayList<List<String>> phraseList=new ArrayList<>();
-    private NodeFactory                 _nodeFactory;
+    private MarkovChainMixin            _mixin;
 
     public double matchingFaktor(List<String> resultingPhrase){
         double faktor;
@@ -559,12 +591,12 @@ public class MarkovChain {
      * Set custom node factory.
      * @param factory Node factory instance or NULL to reset to default
      */
-    public void setNodeFactory(NodeFactory factory) {
+    public void setNodeFactory(MarkovChainMixin factory) {
 
         if (factory == null) {
-            _nodeFactory = new NodeFactory();
+            _mixin = new MarkovChainMixin();
         } else {
-            _nodeFactory = factory;
+            _mixin = factory;
         }
     }
 
@@ -585,12 +617,12 @@ public class MarkovChain {
 
             Node n1 = _nodes.get(l1);
             if (null == n1) {
-                n1 = _nodeFactory.create(l1);
+                n1 = _mixin.create(l1);
                 _nodes.put(n1.getLabel(), n1);
             }
             Node n2 = _nodes.get(l2);
             if (null == n2) {
-                n2 = _nodeFactory.create(l2);
+                n2 = _mixin.create(l2);
                 _nodes.put(n2.getLabel(), n2);
             }
 
@@ -616,7 +648,7 @@ public class MarkovChain {
         Label label = sw.slide();
         Node root = _nodes.get(label);
         if (root == null) {
-            root = _nodeFactory.create(label);
+            root = _mixin.create(label);
             _nodes.put(root.getLabel(), root);
         }
         root.associate(phrase, sw.getOffset());
@@ -627,7 +659,7 @@ public class MarkovChain {
             Label l2 = sw.slide();
             Node n2 = _nodes.get(l2);
             if (n2 == null) {
-                n2 = _nodeFactory.create(l2);
+                n2 = _mixin.create(l2);
                 _nodes.put(n2.getLabel(), n2);
             }
             n2.associate(phrase, sw.getOffset());
@@ -695,6 +727,8 @@ public class MarkovChain {
             return -1.0;
         }
 
+        int queryId = _mixin.initQuery(phrase);
+
         // Find first matching node
         SlidingWindow sw = new SlidingWindow(phrase, _order);
         while (sw.canSlide()) {
@@ -714,6 +748,7 @@ public class MarkovChain {
         while (sw.canSlide()) {
             Label label = sw.slide();
             Edge edge = node.queryEdge(label, details, offset + nEdges);
+            _mixin.updateQuery(queryId, node, label);
             if (edge != null) {
                 nEdges++;
                 sumProbabilities += edge.getProbability();
@@ -722,6 +757,8 @@ public class MarkovChain {
                 break;
             }
         }
+
+        _mixin.finishQuery(queryId);
 
         // Capture details
         double avgProbability = sumProbabilities /nEdges ;

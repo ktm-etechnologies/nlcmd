@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 public class MarkovChainApiTest {
@@ -37,7 +38,7 @@ public class MarkovChainApiTest {
         _createNodeFactory_NodeCreated = false;
 
         MarkovChain mc = new MarkovChain(_ORDER);
-        mc.setNodeFactory(new NodeFactory() {
+        mc.setNodeFactory(new MarkovChainMixin() {
             Node create(Label label) {
                 _createNodeFactory_NodeCreated = true;
                 return new Node(label) {};
@@ -58,7 +59,7 @@ public class MarkovChainApiTest {
         _createNodeSubclass_TestNode = null;
 
         MarkovChain mc = new MarkovChain(_ORDER);
-        mc.setNodeFactory(new NodeFactory() {
+        mc.setNodeFactory(new MarkovChainMixin() {
             Node create(Label label) {
                 _createNodeSubclass_TestNode = new TestNode(label);
                 return _createNodeSubclass_TestNode;
@@ -83,6 +84,7 @@ public class MarkovChainApiTest {
             super(label);
         }
 
+        @Override
         void associate(List<String> phrase, int offset) {
             _phraseHash = phrase.hashCode();
             _offset = offset;
@@ -91,5 +93,45 @@ public class MarkovChainApiTest {
         int getPhraseHash() { return _phraseHash; }
 
         int getOffset() { return _offset; }
+    }
+
+    @Test
+    public void markov_createTestMixin() {
+
+        MarkovChain mc = new MarkovChain(_ORDER);
+        TestMixin mixin = new TestMixin();
+        mc.setNodeFactory(mixin);
+        List<String> train = new LinkedList<>(Arrays.asList("foo", "bar", "baz"));
+        mc.train(train);
+
+        List<String> phrase = new LinkedList<>(Arrays.asList("foo", "bar", "baz"));
+        double result = mc.match(phrase);
+
+        assertNotEquals(mixin._initId, 0);
+        assertEquals(mixin._initId, mixin._updateId);
+        assertEquals(mixin._updateId, mixin._finishId);
+    }
+
+    class TestMixin extends MarkovChainMixin {
+
+        int _initId;
+        int _updateId;
+        int _finishId;
+
+        @Override
+        int initQuery(List<String> phrase) {
+            _initId = super.initQuery(phrase);
+            return _initId;
+        }
+
+        @Override
+        void updateQuery(int id, Node node, Label label) {
+            _updateId = id;
+        }
+
+        @Override
+        void finishQuery(int id) {
+            _finishId = id;
+        }
     }
 }
