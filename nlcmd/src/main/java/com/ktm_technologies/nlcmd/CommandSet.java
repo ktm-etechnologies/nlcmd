@@ -21,32 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Custom scoring relative to phrase length
- */
-class Mixin extends MarkovChainMixin {
-
-    @Override
-    int initQuery(List<String> phrase) {
-
-        int id = super.initQuery(phrase);
-        // TODO
-        return id;
-    }
-
-    @Override
-    void updateQuery(int id, Node node, Label label) {
-
-        // TODO
-    }
-
-    @Override
-    void finishQuery(int id) {
-
-        // TODO
-    }
-}
-
-/**
  * Represents a set of commands, with each command being represented by a
  * {@link MarkovChain}.
  */
@@ -148,5 +122,31 @@ public class CommandSet extends HashMap<String, MarkovChain> {
         }
 
         return key;
+    }
+
+    /**
+     * Custom scoring relative to phrase length
+     */
+    class Mixin extends MarkovChainMixin {
+
+        @Override
+        int initQuery(List<String> phrase) {
+
+            int id = super.initQuery(phrase);
+            // TODO
+            return id;
+        }
+
+        @Override
+        void updateQuery(int id, Node node, Label label) {
+
+            // TODO
+        }
+
+        @Override
+        void finishQuery(int id) {
+
+            // TODO
+        }
     }
 }
