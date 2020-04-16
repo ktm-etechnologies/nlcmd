@@ -495,9 +495,9 @@ class MarkovChainMixin {
      * Individual query step.
      * @param id Unique query ID
      * @param node Node that is queried
-     * @param label Edge label to query for
+     * @param edge Outgoing Edge objects
      */
-    void updateQuery(int id, Node node, Label label) {
+    void updateQuery(int id, Node node, Edge edge) {
 
     }
 
@@ -746,8 +746,8 @@ public class MarkovChain {
         while (sw.canSlide()) {
             Label label = sw.slide();
             Edge edge = node.queryEdge(label, details, offset + nEdges);
-            _mixin.updateQuery(queryId, node, label);
             if (edge != null) {
+                _mixin.updateQuery(queryId, node, edge);
                 nEdges++;
                 sumProbabilities += edge.getProbability();
                 node = edge.getNode();

@@ -125,7 +125,7 @@ public class MarkovChainApiTest {
         }
 
         @Override
-        void updateQuery(int id, Node node, Label label) {
+        void updateQuery(int id, Node node, Edge edge) {
             _updateId = id;
         }
 

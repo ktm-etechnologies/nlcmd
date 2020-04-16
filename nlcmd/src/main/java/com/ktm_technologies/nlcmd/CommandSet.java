@@ -18,7 +18,9 @@ package com.ktm_technologies.nlcmd;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Represents a set of commands, with each command being represented by a
@@ -129,24 +131,67 @@ public class CommandSet extends HashMap<String, MarkovChain> {
      */
     class Mixin extends MarkovChainMixin {
 
+        private int             _phraseLen;
+        // TODO implement parallel matches per id
+        private List<Double>    _sumSubmatchP = new LinkedList<>();
+        private List<Integer>   _nSubmatchEdges = new LinkedList<>();
+
         @Override
         int initQuery(List<String> phrase) {
 
+            _phraseLen = phrase.size();
             int id = super.initQuery(phrase);
-            // TODO
+
+            // Extend lists
+            _sumSubmatchP.add(0.0);
+            _nSubmatchEdges.add(0);
+
             return id;
         }
 
         @Override
-        void updateQuery(int id, Node node, Label label) {
+        void updateQuery(int id, Node node, Edge edge) {
 
-            // TODO
+            // Update lists
+            int length = _sumSubmatchP.size();
+            double avgP = _sumSubmatchP.get(length - 1);
+            avgP += edge.getProbability();
+            _sumSubmatchP.remove(length - 1);
+            _sumSubmatchP.add(avgP);
+
+            length = _nSubmatchEdges.size();
+            int nEdges = _nSubmatchEdges.get(length - 1);
+            nEdges++;
+            _nSubmatchEdges.remove(length - 1);
+            _nSubmatchEdges.add(nEdges);
         }
 
         @Override
         void finishQuery(int id) {
+        }
 
-            // TODO
+        double getScore() {
+
+            // Find longest sub-match
+            int maxIndex = -1;
+            int maxLen = 0;
+            ListIterator<Integer> iter = _nSubmatchEdges.listIterator();
+            while (iter.hasNext()) {
+                int index = iter.nextIndex();
+                int len = iter.next();
+                if (len > maxLen) {
+                    maxLen = len;
+                    maxIndex = index;
+                }
+            }
+
+
+            if (maxIndex > -1) {
+                double avgSubmatchP = _sumSubmatchP.get(maxIndex) / _phraseLen;
+                return avgSubmatchP;
+            }
+
+            return 0;
         }
     }
 }
