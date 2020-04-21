@@ -572,7 +572,7 @@ public class MarkovChain {
     public MarkovChain(int order) {
 
         _order = order;
-        setNodeFactory(null);
+        setMixin(null);
     }
 
     /**
@@ -584,16 +584,24 @@ public class MarkovChain {
     }
 
     /**
-     * Set custom node factory.
-     * @param factory Node factory instance or NULL to reset to default
+     * @return Node customization and scoring mixin instance
      */
     @SuppressWarnings("WeakerAccess")
-    public void setNodeFactory(MarkovChainMixin factory) {
+    public MarkovChainMixin getMixin() {
 
-        if (factory == null) {
+        return _mixin;
+    }
+
+    /**
+     * Set custom customization and scoring mixin.
+     * @param mixin Mixin instance or NULL to reset to default
+     */
+    public void setMixin(MarkovChainMixin mixin) {
+
+        if (mixin == null) {
             _mixin = new MarkovChainMixin();
         } else {
-            _mixin = factory;
+            _mixin = mixin;
         }
     }
 

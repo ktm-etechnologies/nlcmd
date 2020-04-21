@@ -48,7 +48,7 @@ public class CommandSetTest {
             "navigate to <location>",
             "load route to <location>"
         };
-        CommandSet cs = new CommandSet(_ORDER);
+        CommandSet cs = new CommandSet(_ORDER, CommandSet.SCORE_HIGHEST_AVG);
         cs.put("destination", commands);
 
         List<String> phrase = Arrays.asList("load route to Munderfing".split(" "));
@@ -65,7 +65,7 @@ public class CommandSetTest {
     @Test
     public void command_matchNavigation() {
 
-        CommandSet cs = new CommandSet(_ORDER);
+        CommandSet cs = new CommandSet(_ORDER, CommandSet.SCORE_HIGHEST_AVG);
         cs.put("destination", createDestinationChainW2());
         cs.put("waypoint", createWaypointChainW2());
         cs.put("skip", createSkipWaypointChainW2());
@@ -77,7 +77,7 @@ public class CommandSetTest {
     @Test
     public void command_scanNavigation() {
 
-        CommandSet cs = new CommandSet(_ORDER);
+        CommandSet cs = new CommandSet(_ORDER, CommandSet.SCORE_HIGHEST_AVG);
         cs.put("destination", createDestinationChainW2());
         cs.put("waypoint", createWaypointChainW2());
         cs.put("skip", createSkipWaypointChainW2());
@@ -91,6 +91,48 @@ public class CommandSetTest {
             assertEquals(entry.getValue(), 1.0, 0.0001);
             break;
         }
+    }
+
+    @Test
+    public void command_highestAverage() {
+
+        CommandSet cs = new CommandSet(_ORDER, CommandSet.SCORE_HIGHEST_AVG);
+        String[] phrases1 = {
+                "a b c d e f",
+                "a x b x c x d x e x"
+        };
+        cs.put("longMatch", phrases1);
+
+        String[] phrases2 = {
+                "a b c d e",
+        };
+        cs.put("highProbability", phrases2);
+
+        List<String> phrase = Arrays.asList("a b c d e f".split(" "));
+        String key = cs.match(phrase);
+        assertEquals(key, "highProbability");
+    }
+
+    @Test
+    public void command_longestMatchW1() throws Exception {
+
+        CommandSet cs = new CommandSet(1, CommandSet.SCORE_LONGEST_AVG_REL);
+        String[] phrases1 = {
+                "a b c d e f",
+                "a x b x c x d x e x"
+        };
+        cs.put("longMatch", phrases1);
+        ReadWriteTests.writeDot("longMatch", cs);
+
+        String[] phrases2 = {
+                "a b c d e",
+        };
+        cs.put("highProbability", phrases2);
+        ReadWriteTests.writeDot("highProbability", cs);
+
+        List<String> phrase = Arrays.asList("a b c d e f".split(" "));
+        String key = cs.match(phrase);
+        assertEquals(key, "longMatch");
     }
 
     private static MarkovChain createDestinationChainW2() {

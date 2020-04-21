@@ -38,7 +38,7 @@ public class MarkovChainApiTest {
         _createNodeFactory_NodeCreated = false;
 
         MarkovChain mc = new MarkovChain(_ORDER);
-        mc.setNodeFactory(new MarkovChainMixin() {
+        mc.setMixin(new MarkovChainMixin() {
             Node create(Label label) {
                 _createNodeFactory_NodeCreated = true;
                 return new Node(label) {};
@@ -59,7 +59,7 @@ public class MarkovChainApiTest {
         _createNodeSubclass_TestNode = null;
 
         MarkovChain mc = new MarkovChain(_ORDER);
-        mc.setNodeFactory(new MarkovChainMixin() {
+        mc.setMixin(new MarkovChainMixin() {
             Node create(Label label) {
                 _createNodeSubclass_TestNode = new TestNode(label);
                 return _createNodeSubclass_TestNode;
@@ -100,7 +100,7 @@ public class MarkovChainApiTest {
 
         MarkovChain mc = new MarkovChain(_ORDER);
         TestMixin mixin = new TestMixin();
-        mc.setNodeFactory(mixin);
+        mc.setMixin(mixin);
         List<String> train = new LinkedList<>(Arrays.asList("foo", "bar", "baz"));
         mc.train(train);
 

@@ -22,6 +22,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import static com.ktm_technologies.nlcmd.Nlcmd.*;
+
 /**
  * Represents a set of commands, with each command being represented by a
  * {@link MarkovChain}.
@@ -29,6 +31,12 @@ import java.util.ListIterator;
 @SuppressWarnings("WeakerAccess")
 public class CommandSet extends HashMap<String, MarkovChain> {
 
+    public static final int SCORE_HIGHEST_AVG = 0;
+    public static final int SCORE_LONGEST_AVG_REL = 1;
+    public static final int SCORE_LONGEST_AVG_REL_MOR = 2;
+    private final int _SCORE_INVALID = 3;
+
+    private int _scoreMode;
     private int _order;
 
     /**
@@ -36,14 +44,27 @@ public class CommandSet extends HashMap<String, MarkovChain> {
      *
      * @param order Order for markov chains created via the {@link CommandSet#put(String, String[])}
      *              method, that is number of relevant previous steps when matching
+     * @param scoreMode See SCORE_*
      * @throws ArrayIndexOutOfBoundsException If order < 1
      */
-    public CommandSet(int order) throws ArrayIndexOutOfBoundsException {
+    public CommandSet(int order, int scoreMode) throws ArrayIndexOutOfBoundsException {
 
         if (order < 1) {
             throw new ArrayIndexOutOfBoundsException("MarkovChain order size can not be < 1");
         }
         _order = order;
+
+        if (scoreMode < 0 || scoreMode > _SCORE_INVALID) {
+            throw new ArrayIndexOutOfBoundsException("Score mode must be >= 0 and < " + _SCORE_INVALID);
+        }
+        _scoreMode = scoreMode;
+    }
+
+    /**
+     * @return Current scoring algorithm, see SCORE_*
+     */
+    public int getScoreMode() {
+        return _scoreMode;
     }
 
     /**
@@ -55,7 +76,7 @@ public class CommandSet extends HashMap<String, MarkovChain> {
     public void put(String      key,
                     String[]    commands) {
 
-        MarkovChain mc = new MarkovChain(_order);
+        MarkovChain mc = createChain();
         for (String command : commands) {
             List<String> phrase = Arrays.asList(command.split(" "));
             mc.train(phrase);
@@ -74,14 +95,19 @@ public class CommandSet extends HashMap<String, MarkovChain> {
 
         double maxAvgProbability = -1;
         String key = null;
+        double avgProbability;
         for (Entry<String, MarkovChain> entry : this.entrySet()) {
 
-            double avgProbability = entry.getValue().match(phrase);
+            MarkovChain mc = entry.getValue();
+            avgProbability = mc.match(phrase);
+            avgProbability = extractScore(mc, avgProbability);
             if (avgProbability > maxAvgProbability) {
                 maxAvgProbability = avgProbability;
                 key = entry.getKey();
             }
         }
+
+        d("CommandSet.match", String.format("%f", maxAvgProbability));
 
         return key;
     }
@@ -101,12 +127,13 @@ public class CommandSet extends HashMap<String, MarkovChain> {
 
         double maxAvgProbability = -1;
         String key = null;
-
         for (Entry<String, MarkovChain> entry : this.entrySet()) {
 
             HashMap<List<String>, Double> matches_ = new HashMap<>();
             HashMap<String, List<String>> placeholders_ = new HashMap<>();
-            double avgProbability = entry.getValue().scan(phrase, matches_, placeholders_);
+            MarkovChain mc = entry.getValue();
+            double avgProbability = mc.scan(phrase, matches_, placeholders_);
+            avgProbability = extractScore(mc, avgProbability);
             if (avgProbability > maxAvgProbability) {
                 maxAvgProbability = avgProbability;
                 key = entry.getKey();
@@ -123,7 +150,39 @@ public class CommandSet extends HashMap<String, MarkovChain> {
             }
         }
 
+        d("CommandSet.match", String.format("%f", maxAvgProbability));
+
         return key;
+    }
+
+    private MarkovChain createChain() {
+
+        MarkovChain mc = new MarkovChain(_order);
+        if (_scoreMode == SCORE_HIGHEST_AVG) {
+            // Nothing to do
+        } else  if (_scoreMode == SCORE_LONGEST_AVG_REL) {
+            Mixin mixin = new Mixin();
+            mc.setMixin(mixin);
+        } else if (_scoreMode == SCORE_LONGEST_AVG_REL_MOR) {
+            // TODO implement, fail for now
+            return null;
+        }
+
+        return mc;
+    }
+
+    private double extractScore(MarkovChain mc, double defaultScore) {
+
+        if (_scoreMode == SCORE_HIGHEST_AVG) {
+            return defaultScore;
+        } else if (_scoreMode == SCORE_LONGEST_AVG_REL) {
+            Mixin mixin = mc.getMixin() instanceof Mixin ? (Mixin)mc.getMixin() : null;
+            return mixin.getScore();
+        } else if (_scoreMode == SCORE_LONGEST_AVG_REL_MOR) {
+            throw new RuntimeException("Not implemented");
+        } else {
+            throw new RuntimeException("Unknown score mode " + _scoreMode);
+        }
     }
 
     /**

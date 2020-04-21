@@ -91,4 +91,14 @@ public class ReadWriteTests {
         mc.traverse(writer);
     }
 
+    static void writeDot(String tag, MarkovChain mc) throws Exception {
+
+        DotWriter writer = new DotWriter(tag, new PrintStream(System.out));
+        mc.traverse(writer);
+    }
+
+    static void writeDot(String tag, CommandSet cs) throws Exception {
+
+        writeDot(tag, cs.get(tag));
+    }
 }
