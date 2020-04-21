@@ -92,6 +92,26 @@ public class MarkovChainTest {
     }
 
     @Test
+    public void markov_matchLongW1() {
+        MarkovChain mc = new MarkovChain(1);
+        List<String> model = Arrays.asList("a b c d".split(" "));
+        mc.train(model);
+        List<String> phrase = Arrays.asList("a b c d e".split(" "));
+        double result = mc.match(phrase);
+        assertEquals(0.0, result, 0.0001);
+    }
+
+    @Test
+    public void markov_scanLongW1() {
+        MarkovChain mc = new MarkovChain(1);
+        List<String> model = Arrays.asList("a b c d".split(" "));
+        mc.train(model);
+        List<String> phrase = Arrays.asList("a b c d e".split(" "));
+        double result = mc.scan(phrase, null, null);
+        assertEquals(1.0, result, 0.0001);
+    }
+
+    @Test
     public void markov_scanSingleFull() {
         MarkovChain mc = createFooBarBazChain();
         List<String> phrase = new LinkedList<>(Arrays.asList("foo", "bar", "baz"));
@@ -272,7 +292,7 @@ public class MarkovChainTest {
         assertTrue(ret);
     }
 
-    public static MarkovChain createFooBarBazChain() {
+    static MarkovChain createFooBarBazChain() {
         MarkovChain mc = new MarkovChain(MarkovChainTest._ORDER);
         List<String> phrase = new LinkedList<>(Arrays.asList("foo", "bar", "baz"));
         mc.train(phrase);
@@ -293,21 +313,21 @@ public class MarkovChainTest {
         return mc;
     }
 
-    public static MarkovChain createFoxChainW1() {
+    static MarkovChain createFoxChainW1() {
         MarkovChain mc = new MarkovChain(1);
         List<String> phrase = new LinkedList<>(Arrays.asList("the quick brown fox jumps over the lazy dog".split( " ")));
         mc.train(phrase);
         return mc;
     }
 
-    public static MarkovChain createFoxChainW2() {
+    static MarkovChain createFoxChainW2() {
         MarkovChain mc = new MarkovChain(2);
         List<String> phrase = new LinkedList<>(Arrays.asList("the quick brown fox jumps over the lazy dog".split( " ")));
         mc.train(phrase);
         return mc;
     }
 
-    public static MarkovChain createFishChainW1() {
+    static MarkovChain createFishChainW1() {
         MarkovChain mc = new MarkovChain(1);
         List<String> phrase = new LinkedList<>(Arrays.asList("one fish two fish red fish blue fish".split( " ")));
         mc.train(phrase);

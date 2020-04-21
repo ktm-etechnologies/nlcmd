@@ -195,7 +195,9 @@ class Result {
                         HashMap<String, List<String>>   placeholders) {
 
         for (Phrase phrase : _entries) {
-            matches.put(phrase.getPhrase(), phrase.getAvgProbability());
+            if (matches != null) {
+                matches.put(phrase.getPhrase(), phrase.getAvgProbability());
+            }
             Placeholder placeholder = phrase.getPlaceholder();
             if (placeholders != null && placeholder != null) {
                 placeholders.put(placeholder.getToken(), placeholder.getPhrase());
