@@ -447,13 +447,11 @@ interface Stream {
      * Invoked when starting to iterate a graph inside the model.
      * @param labelFragments Node label
      */
-    @SuppressWarnings("RedundantThrows")
     void startGraph(String[] labelFragments) throws Exception;
 
     /**
      * Invoked when iteration of the current graph is finished.
      */
-    @SuppressWarnings("RedundantThrows")
     void endGraph() throws Exception;
 
     /**
@@ -461,7 +459,6 @@ interface Stream {
      * @param probability Probability for the edge
      * @param labelFragments Target node label
      */
-    @SuppressWarnings("RedundantThrows")
     void addEdge(double probability,
                  String[] labelFragments)
         throws Exception;
@@ -499,7 +496,6 @@ class MarkovChainMixin {
      * @param id Unique query ID
      * @param node Node that is queried
      * @param label Edge label to query for
-     * @return Next node or NULL
      */
     void updateQuery(int id, Node node, Label label) {
 
@@ -591,6 +587,7 @@ public class MarkovChain {
      * Set custom node factory.
      * @param factory Node factory instance or NULL to reset to default
      */
+    @SuppressWarnings("WeakerAccess")
     public void setNodeFactory(MarkovChainMixin factory) {
 
         if (factory == null) {
@@ -680,6 +677,7 @@ public class MarkovChain {
      * @return Average probability: sum of probabilities / number of edges.
      *         Negative value if phrase shorter than two entries such that matching is not possible.
      */
+    @SuppressWarnings("WeakerAccess")
     public double match(List<String> phrase) {
 
         Result details;
@@ -779,8 +777,11 @@ public class MarkovChain {
      * sub-phrases are made.
      *
      * @param phrase Match phrase
+     * @param matches Map of phrase : probability, may be null
+     * @param placeholders Map of placeholder : variable, may be null
      * @return Average probability: sum of probabilities / number of edges for the best matching sub-phrase
      */
+    @SuppressWarnings("WeakerAccess")
     public double scan(List<String>                     phrase,
                        HashMap<List<String>, Double>    matches,
                        HashMap<String, List<String>>    placeholders) {
