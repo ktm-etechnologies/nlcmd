@@ -96,21 +96,21 @@ public class CommandSetTest {
     @Test
     public void command_highestAverage() {
 
-        CommandSet cs = new CommandSet(_ORDER, CommandSet.SCORE_HIGHEST_AVG);
-        String[] phrases1 = {
+        CommandSet cs = new CommandSet(1, CommandSet.SCORE_HIGHEST_AVG);
+        String[] model1 = {
                 "a b c d e f",
                 "a x b x c x d x e x"
         };
-        cs.put("longMatch", phrases1);
+        cs.put("longMatch", model1);
 
-        String[] phrases2 = {
-                "a b c d e",
+        String[] model2 = {
+                "a b",
         };
-        cs.put("highProbability", phrases2);
+        cs.put("highProbability", model2);
 
         List<String> phrase = Arrays.asList("a b c d e f".split(" "));
-        String key = cs.match(phrase);
-        assertEquals(key, "highProbability");
+        String key = cs.scan(phrase, null, null);
+        assertEquals("highProbability", key);
     }
 
     @Test
@@ -125,14 +125,14 @@ public class CommandSetTest {
         ReadWriteTests.writeDot("longMatch", cs);
 
         String[] phrases2 = {
-                "a b c d e",
+                "a b",
         };
         cs.put("highProbability", phrases2);
         ReadWriteTests.writeDot("highProbability", cs);
 
         List<String> phrase = Arrays.asList("a b c d e f".split(" "));
-        String key = cs.match(phrase);
-        assertEquals(key, "longMatch");
+        String key = cs.scan(phrase, null, null);
+        assertEquals("longMatch", key);
     }
 
     private static MarkovChain createDestinationChainW2() {

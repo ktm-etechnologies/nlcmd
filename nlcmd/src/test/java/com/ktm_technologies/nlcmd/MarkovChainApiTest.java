@@ -130,7 +130,7 @@ public class MarkovChainApiTest {
         }
 
         @Override
-        void finishQuery(int id) {
+        void finishQuery(int id, boolean success) {
             _finishId = id;
         }
     }

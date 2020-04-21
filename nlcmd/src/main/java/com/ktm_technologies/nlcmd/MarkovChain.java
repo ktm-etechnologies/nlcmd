@@ -504,8 +504,9 @@ class MarkovChainMixin {
     /**
      * Complete the query
      * @param id Unique query ID
+     * @param success Whether the query had at least one successful match
      */
-    void finishQuery(int id) {
+    void finishQuery(int id, boolean success) {
 
     }
 }
@@ -596,6 +597,7 @@ public class MarkovChain {
      * Set custom customization and scoring mixin.
      * @param mixin Mixin instance or NULL to reset to default
      */
+    @SuppressWarnings("WeakerAccess")
     public void setMixin(MarkovChainMixin mixin) {
 
         if (mixin == null) {
@@ -764,7 +766,7 @@ public class MarkovChain {
             }
         }
 
-        _mixin.finishQuery(queryId);
+        _mixin.finishQuery(queryId, nEdges > 0);
 
         // Capture details
         double avgProbability = sumProbabilities /nEdges ;

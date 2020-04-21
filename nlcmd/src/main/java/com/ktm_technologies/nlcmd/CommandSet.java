@@ -16,13 +16,16 @@
 
 package com.ktm_technologies.nlcmd;
 
+import android.annotation.SuppressLint;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import static com.ktm_technologies.nlcmd.Nlcmd.*;
+import static com.ktm_technologies.nlcmd.Nlcmd.d;
+import static com.ktm_technologies.nlcmd.Nlcmd.v;
 
 /**
  * Represents a set of commands, with each command being represented by a
@@ -34,6 +37,7 @@ public class CommandSet extends HashMap<String, MarkovChain> {
     public static final int SCORE_HIGHEST_AVG = 0;
     public static final int SCORE_LONGEST_AVG_REL = 1;
     public static final int SCORE_LONGEST_AVG_REL_MOR = 2;
+    @SuppressWarnings("FieldCanBeLocal")
     private final int _SCORE_INVALID = 3;
 
     private int _scoreMode;
@@ -91,6 +95,7 @@ public class CommandSet extends HashMap<String, MarkovChain> {
      * @param phrase Match phrase
      * @return Key for best matching command or null
      */
+    @SuppressLint("DefaultLocale")
     public String match(List<String> phrase) {
 
         double maxAvgProbability = -1;
@@ -107,7 +112,7 @@ public class CommandSet extends HashMap<String, MarkovChain> {
             }
         }
 
-        d("CommandSet.match", String.format("%f", maxAvgProbability));
+        d("CommandSet.match", maxAvgProbability);
 
         return key;
     }
@@ -150,7 +155,7 @@ public class CommandSet extends HashMap<String, MarkovChain> {
             }
         }
 
-        d("CommandSet.match", String.format("%f", maxAvgProbability));
+        d("CommandSet.match", maxAvgProbability);
 
         return key;
     }
@@ -158,6 +163,7 @@ public class CommandSet extends HashMap<String, MarkovChain> {
     private MarkovChain createChain() {
 
         MarkovChain mc = new MarkovChain(_order);
+        //noinspection StatementWithEmptyBody
         if (_scoreMode == SCORE_HIGHEST_AVG) {
             // Nothing to do
         } else  if (_scoreMode == SCORE_LONGEST_AVG_REL) {
@@ -171,7 +177,7 @@ public class CommandSet extends HashMap<String, MarkovChain> {
         return mc;
     }
 
-    private double extractScore(MarkovChain mc, double defaultScore) {
+    private double extractScore(MarkovChain mc, double defaultScore) throws RuntimeException {
 
         if (_scoreMode == SCORE_HIGHEST_AVG) {
             return defaultScore;
@@ -201,6 +207,8 @@ public class CommandSet extends HashMap<String, MarkovChain> {
             _phraseLen = phrase.size();
             int id = super.initQuery(phrase);
 
+            v(this.getClass().getName() + ".initQuery() _phraseLen", _phraseLen);
+
             // Extend lists
             _sumSubmatchP.add(0.0);
             _nSubmatchEdges.add(0);
@@ -226,7 +234,7 @@ public class CommandSet extends HashMap<String, MarkovChain> {
         }
 
         @Override
-        void finishQuery(int id) {
+        void finishQuery(int id, boolean success) {
         }
 
         double getScore() {
