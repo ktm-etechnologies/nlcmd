@@ -23,7 +23,6 @@ import java.util.Locale;
 /**
  * Used for writing model to Graphviz dot format.
  */
-@SuppressWarnings("SpellCheckingInspection")
 public class DotWriter implements Stream {
 
     private final String        _name;

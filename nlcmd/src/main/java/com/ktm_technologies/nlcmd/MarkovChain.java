@@ -495,17 +495,18 @@ class MarkovChainMixin {
      * Individual query step.
      * @param id Unique query ID
      * @param node Node that is queried
-     * @param label Edge label to query for
+     * @param edge Outgoing Edge objects
      */
-    void updateQuery(int id, Node node, Label label) {
+    void updateQuery(int id, Node node, Edge edge) {
 
     }
 
     /**
      * Complete the query
      * @param id Unique query ID
+     * @param success Whether the query had at least one successful match
      */
-    void finishQuery(int id) {
+    void finishQuery(int id, boolean success) {
 
     }
 }
@@ -572,7 +573,7 @@ public class MarkovChain {
     public MarkovChain(int order) {
 
         _order = order;
-        setNodeFactory(null);
+        setMixin(null);
     }
 
     /**
@@ -584,16 +585,25 @@ public class MarkovChain {
     }
 
     /**
-     * Set custom node factory.
-     * @param factory Node factory instance or NULL to reset to default
+     * @return Node customization and scoring mixin instance
      */
     @SuppressWarnings("WeakerAccess")
-    public void setNodeFactory(MarkovChainMixin factory) {
+    public MarkovChainMixin getMixin() {
 
-        if (factory == null) {
+        return _mixin;
+    }
+
+    /**
+     * Set custom customization and scoring mixin.
+     * @param mixin Mixin instance or NULL to reset to default
+     */
+    @SuppressWarnings("WeakerAccess")
+    public void setMixin(MarkovChainMixin mixin) {
+
+        if (mixin == null) {
             _mixin = new MarkovChainMixin();
         } else {
-            _mixin = factory;
+            _mixin = mixin;
         }
     }
 
@@ -746,8 +756,8 @@ public class MarkovChain {
         while (sw.canSlide()) {
             Label label = sw.slide();
             Edge edge = node.queryEdge(label, details, offset + nEdges);
-            _mixin.updateQuery(queryId, node, label);
             if (edge != null) {
+                _mixin.updateQuery(queryId, node, edge);
                 nEdges++;
                 sumProbabilities += edge.getProbability();
                 node = edge.getNode();
@@ -756,7 +766,7 @@ public class MarkovChain {
             }
         }
 
-        _mixin.finishQuery(queryId);
+        _mixin.finishQuery(queryId, nEdges > 0);
 
         // Capture details
         double avgProbability = sumProbabilities /nEdges ;
