@@ -18,3 +18,5 @@ Features include
 The code is in proof-of-concept stage and feedback is welcome. 
 * Github page: https://github.com/ktm-technologies/nlcmd/
 * API reference: https://ktm-technologies.github.io/nlcmd/doc/
+
+Proudly supported by [KTM Technologies](https://ktm-technologies.com)
