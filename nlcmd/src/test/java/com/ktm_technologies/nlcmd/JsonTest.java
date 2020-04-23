@@ -34,7 +34,7 @@ public class JsonTest {
     public void roundtripJsonW1() throws Exception {
 
         MarkovChain mc1 = MarkovChainTest.createFoxChainW1();
-        List<String> phrase = new LinkedList<>(Arrays.asList("over", "the", "lazy", "dog"));
+        List<String> phrase = Arrays.asList("over", "the", "lazy", "dog");
         double result1 = mc1.scan(phrase, new Result());
         assertEquals(0.83333, result1, 0.0001);
 
@@ -54,7 +54,7 @@ public class JsonTest {
     public void roundtripJsonW2() throws Exception {
 
         MarkovChain mc1 = MarkovChainTest.createFoxChainW2();
-        List<String> phrase = new LinkedList<>(Arrays.asList("over", "the", "lazy", "dog"));
+        List<String> phrase = Arrays.asList("over", "the", "lazy", "dog");
         double result1 = mc1.scan(phrase, new Result());
         assertEquals(1.0, result1, 0.0001);
 
