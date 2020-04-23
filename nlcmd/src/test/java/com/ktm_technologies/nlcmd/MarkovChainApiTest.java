@@ -101,10 +101,10 @@ public class MarkovChainApiTest {
         MarkovChain mc = new MarkovChain(_ORDER);
         TestMixin mixin = new TestMixin();
         mc.setMixin(mixin);
-        List<String> train = new LinkedList<>(Arrays.asList("foo", "bar", "baz"));
+        List<String> train = Arrays.asList("foo", "bar", "baz");
         mc.train(train);
 
-        List<String> phrase = new LinkedList<>(Arrays.asList("foo", "bar", "baz"));
+        List<String> phrase = Arrays.asList("foo", "bar", "baz");
         double result = mc.match(phrase);
 
         assertNotEquals(mixin._initId, 0);
