@@ -32,15 +32,9 @@ import static com.ktm_technologies.nlcmd.Nlcmd.v;
  * {@link MarkovChain}.
  */
 @SuppressWarnings("WeakerAccess")
-public class CommandSet extends HashMap<String, MarkovChain> {
+public class CommandSet extends HashMap<Object, MarkovChain> {
 
-    public static final int SCORE_HIGHEST_AVG = 0;
-    public static final int SCORE_LONGEST_AVG_REL = 1;
-    public static final int SCORE_LONGEST_AVG_REL_MOR = 2;
-    @SuppressWarnings("FieldCanBeLocal")
-    private final int _SCORE_INVALID = 3;
-
-    private int _scoreMode;
+    private ScoreMode _scoreMode;
     private int _order;
 
     /**
@@ -48,26 +42,22 @@ public class CommandSet extends HashMap<String, MarkovChain> {
      *
      * @param order Order for markov chains created via the {@link CommandSet#put(String, String[])}
      *              method, that is number of relevant previous steps when matching
-     * @param scoreMode See SCORE_*
-     * @throws ArrayIndexOutOfBoundsException If order < 1
+     * @param scoreMode See {@link ScoreMode}
+     * @throws IndexOutOfBoundsException If order < 1
      */
-    public CommandSet(int order, int scoreMode) throws ArrayIndexOutOfBoundsException {
+    public CommandSet(int order, ScoreMode scoreMode) {
 
         if (order < 1) {
-            throw new ArrayIndexOutOfBoundsException("MarkovChain order size can not be < 1");
+            throw new IndexOutOfBoundsException("MarkovChain order size can not be < 1");
         }
         _order = order;
-
-        if (scoreMode < 0 || scoreMode > _SCORE_INVALID) {
-            throw new ArrayIndexOutOfBoundsException("Score mode must be >= 0 and < " + _SCORE_INVALID);
-        }
         _scoreMode = scoreMode;
     }
 
     /**
-     * @return Current scoring algorithm, see SCORE_*
+     * @return Current scoring algorithm, see {@link ScoreMode}
      */
-    public int getScoreMode() {
+    public ScoreMode getScoreMode() {
         return _scoreMode;
     }
 
@@ -77,7 +67,7 @@ public class CommandSet extends HashMap<String, MarkovChain> {
      * @param key Identifier for this command
      * @param commands Training phrases for the markov chain
      */
-    public void put(String      key,
+    public void put(Object      key,
                     String[]    commands) {
 
         MarkovChain mc = createChain();
@@ -96,12 +86,12 @@ public class CommandSet extends HashMap<String, MarkovChain> {
      * @return Key for best matching command or null
      */
     @SuppressLint("DefaultLocale")
-    public String match(List<String> phrase) {
+    public Object match(List<String> phrase) {
 
         double maxAvgProbability = -1;
-        String key = null;
+        Object key = null;
         double avgProbability;
-        for (Entry<String, MarkovChain> entry : this.entrySet()) {
+        for (Entry<Object, MarkovChain> entry : this.entrySet()) {
 
             MarkovChain mc = entry.getValue();
             avgProbability = mc.match(phrase);
@@ -126,13 +116,13 @@ public class CommandSet extends HashMap<String, MarkovChain> {
      * @param placeholders Map of matches placeholders and their actual input
      * @return Key for best matching command or null
      */
-    public String scan(List<String>                     phrase,
+    public Object scan(List<String>                     phrase,
                        HashMap<List<String>, Double>    matches,
                        HashMap<String, List<String>>    placeholders) {
 
         double maxAvgProbability = -1;
-        String key = null;
-        for (Entry<String, MarkovChain> entry : this.entrySet()) {
+        Object key = null;
+        for (Entry<Object, MarkovChain> entry : this.entrySet()) {
 
             HashMap<List<String>, Double> matches_ = new HashMap<>();
             HashMap<String, List<String>> placeholders_ = new HashMap<>();
@@ -164,12 +154,12 @@ public class CommandSet extends HashMap<String, MarkovChain> {
 
         MarkovChain mc = new MarkovChain(_order);
         //noinspection StatementWithEmptyBody
-        if (_scoreMode == SCORE_HIGHEST_AVG) {
+        if (_scoreMode == ScoreMode.HIGHEST_AVG) {
             // Nothing to do
-        } else  if (_scoreMode == SCORE_LONGEST_AVG_REL) {
+        } else  if (_scoreMode == ScoreMode.LONGEST_AVG_REL) {
             Mixin mixin = new Mixin();
             mc.setMixin(mixin);
-        } else if (_scoreMode == SCORE_LONGEST_AVG_REL_MOR) {
+        } else if (_scoreMode == ScoreMode.LONGEST_AVG_REL_MOR) {
             // TODO implement, fail for now
             return null;
         }
@@ -179,12 +169,12 @@ public class CommandSet extends HashMap<String, MarkovChain> {
 
     private double extractScore(MarkovChain mc, double defaultScore) throws RuntimeException {
 
-        if (_scoreMode == SCORE_HIGHEST_AVG) {
+        if (_scoreMode == ScoreMode.HIGHEST_AVG) {
             return defaultScore;
-        } else if (_scoreMode == SCORE_LONGEST_AVG_REL) {
+        } else if (_scoreMode == ScoreMode.LONGEST_AVG_REL) {
             Mixin mixin = mc.getMixin() instanceof Mixin ? (Mixin)mc.getMixin() : null;
             return mixin.getScore();
-        } else if (_scoreMode == SCORE_LONGEST_AVG_REL_MOR) {
+        } else if (_scoreMode == ScoreMode.LONGEST_AVG_REL_MOR) {
             throw new RuntimeException("Not implemented");
         } else {
             throw new RuntimeException("Unknown score mode " + _scoreMode);
