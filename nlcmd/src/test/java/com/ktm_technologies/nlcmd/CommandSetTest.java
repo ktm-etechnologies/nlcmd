@@ -48,12 +48,12 @@ public class CommandSetTest {
             "navigate to <location>",
             "load route to <location>"
         };
-        CommandSet cs = new CommandSet(_ORDER, CommandSet.SCORE_HIGHEST_AVG);
+        CommandSet cs = new CommandSet(_ORDER, ScoreMode.HIGHEST_AVG);
         cs.put("destination", commands);
 
         List<String> phrase = Arrays.asList("load route to Munderfing".split(" "));
         HashMap<List<String>, Double> matches = new HashMap<>();
-        String key = cs.scan(phrase, matches, null);
+        String key = (String)cs.scan(phrase, matches, null);
         assertEquals(key, "destination");
         for (Map.Entry<List<String>, Double> entry : matches.entrySet()) {
             assertEquals(phrase, entry.getKey());
@@ -65,26 +65,26 @@ public class CommandSetTest {
     @Test
     public void command_matchNavigation() {
 
-        CommandSet cs = new CommandSet(_ORDER, CommandSet.SCORE_HIGHEST_AVG);
+        CommandSet cs = new CommandSet(_ORDER, ScoreMode.HIGHEST_AVG);
         cs.put("destination", createDestinationChainW2());
         cs.put("waypoint", createWaypointChainW2());
         cs.put("skip", createSkipWaypointChainW2());
 
-        String key = cs.match(Arrays.asList("load route to Munderfing".split(" ")));
+        String key = (String)cs.match(Arrays.asList("load route to Munderfing".split(" ")));
         assertEquals(key, "destination");
     }
 
     @Test
     public void command_scanNavigation() {
 
-        CommandSet cs = new CommandSet(_ORDER, CommandSet.SCORE_HIGHEST_AVG);
+        CommandSet cs = new CommandSet(_ORDER, ScoreMode.HIGHEST_AVG);
         cs.put("destination", createDestinationChainW2());
         cs.put("waypoint", createWaypointChainW2());
         cs.put("skip", createSkipWaypointChainW2());
 
         List<String> phrase = Arrays.asList("load route to Munderfing".split(" "));
         HashMap<List<String>, Double> matches = new HashMap<>();
-        String key = cs.scan(phrase, matches, null);
+        String key = (String)cs.scan(phrase, matches, null);
         assertEquals(key, "destination");
         for (Map.Entry<List<String>, Double> entry : matches.entrySet()) {
             assertEquals(phrase, entry.getKey());
@@ -96,7 +96,7 @@ public class CommandSetTest {
     @Test
     public void command_highestAverage() {
 
-        CommandSet cs = new CommandSet(1, CommandSet.SCORE_HIGHEST_AVG);
+        CommandSet cs = new CommandSet(1, ScoreMode.HIGHEST_AVG);
         String[] model1 = {
                 "a b c d e f",
                 "a x b x c x d x e x"
@@ -109,14 +109,14 @@ public class CommandSetTest {
         cs.put("highProbability", model2);
 
         List<String> phrase = Arrays.asList("a b c d e f".split(" "));
-        String key = cs.scan(phrase, null, null);
+        String key = (String)cs.scan(phrase, null, null);
         assertEquals("highProbability", key);
     }
 
     @Test
     public void command_longestMatchW1() throws Exception {
 
-        CommandSet cs = new CommandSet(1, CommandSet.SCORE_LONGEST_AVG_REL);
+        CommandSet cs = new CommandSet(1, ScoreMode.LONGEST_AVG_REL);
         String[] phrases1 = {
                 "a b c d e f",
                 "a x b x c x d x e x"
@@ -131,7 +131,7 @@ public class CommandSetTest {
         ReadWriteTests.writeDot("highProbability", cs);
 
         List<String> phrase = Arrays.asList("a b c d e f".split(" "));
-        String key = cs.scan(phrase, null, null);
+        String key = (String)cs.scan(phrase, null, null);
         assertEquals("longMatch", key);
     }
 
