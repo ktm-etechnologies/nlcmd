@@ -21,7 +21,10 @@ import android.annotation.SuppressLint;
 import java.util.List;
 
 /**
- * This class provides auxiliary functions such as logging.
+ * This class provides static global command matching and execution callback with the #action()
+ * method as well as related settings.
+ *
+ * For internal use there are auxiliary functions such as logging.
  * TODO Actually use java logger instead of System.out
  */
 @SuppressWarnings("WeakerAccess")
@@ -37,6 +40,11 @@ public class Nlcmd {
     private static int _order = 2;
     private static ScoreMode _scoreMode = ScoreMode.LONGEST_AVG_REL;
     private static CommandSet _cs = null;
+
+    /**
+     * Expose only static API, no instantiation.
+     */
+    private Nlcmd() {}
 
     /**
      * @return Score mode, see {@link ScoreMode}
