@@ -24,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -417,8 +418,8 @@ class SlidingWindow {
     @SuppressWarnings("RedundantIfStatement")
     static boolean isPlaceholder(String token) {
 
-        if (token.startsWith("<") &&
-            token.endsWith(">")) {
+        if (token.charAt(0) == Config.START_PH &&
+            token.charAt(token.length() - 1) == Config.END_PH) {
             return true;
         }
 
@@ -516,7 +517,10 @@ class MarkovChainMixin {
  */
 class Config {
 
-    final static Charset CHARSET = Charset.forName("UTF-8");
+    final static Charset CHARSET = StandardCharsets.UTF_8;
+
+    final static char START_PH = '<';
+    final static char END_PH = '>';
 
     final static String JSON_LABEL = "label";
     final static String JSON_ORDER = "order";

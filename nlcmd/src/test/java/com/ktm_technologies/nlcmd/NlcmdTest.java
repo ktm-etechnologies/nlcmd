@@ -19,8 +19,10 @@ package com.ktm_technologies.nlcmd;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.text.BreakIterator;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +37,8 @@ public class NlcmdTest {
 
     @Test
     public void nlcmd_match() {
+
+        _nlcmd_match = false;
 
         // Reset only needed so we can run independent unit tests
         Nlcmd.reset();
@@ -65,7 +69,42 @@ public class NlcmdTest {
     }
 
     @Test
+    public void nlcmd_matchString() {
+
+        _nlcmd_match = false;
+
+        // Reset only needed so we can run independent unit tests
+        Nlcmd.reset();
+        Nlcmd.setOrder(1);
+
+        Nlcmd.action(new String[]{
+                "a b c",
+                "b c d",
+        }, new MatchLambda() {
+            @Override
+            public void run() {
+                // Do nothing, we want to match the other action
+            }
+        });
+
+        Nlcmd.action(new String[]{
+                "c d e",
+                "d e f",
+        }, new MatchLambda() {
+            @Override
+            public void run() {
+                _nlcmd_match = true;
+            }
+        });
+
+        Nlcmd.match("c d e");
+        assertTrue(_nlcmd_match);
+    }
+
+    @Test
     public void nlcmd_scan() {
+
+        _nlcmd_scan = false;
 
         // Reset only needed so we can run independent unit tests
         Nlcmd.reset();
@@ -97,6 +136,8 @@ public class NlcmdTest {
 
     @Test
     public void nlcmd_scanDetails() {
+
+        _nlcmd_scanDetails = false;
 
         // Reset only needed so we can run independent unit tests
         Nlcmd.reset();
@@ -130,6 +171,46 @@ public class NlcmdTest {
         });
 
         Nlcmd.scan(Arrays.asList("a b c d y".split(" ")));
+        assertTrue(_nlcmd_scanDetails);
+    }
+
+    @Test
+    public void nlcmd_scanStringDetails() {
+
+        _nlcmd_scanDetails = false;
+
+        // Reset only needed so we can run independent unit tests
+        Nlcmd.reset();
+        Nlcmd.setOrder(1);
+
+        Nlcmd.action(new String[]{
+                "a b c d e",
+                "a x b x c x d x",
+        }, new ScanLambda() {
+            @Override
+            public void run(HashMap<List<String>, Double> matches,
+                            HashMap<String, List<String>> placeholders) {
+                // Do nothing, we want to match the other action
+            }
+        });
+
+        Nlcmd.action(new String[]{
+                "a b c d e",
+                "a b x d e",
+        }, new ScanLambda() {
+            @Override
+            public void run(HashMap<List<String>, Double> matches,
+                            HashMap<String, List<String>> placeholders) {
+                _nlcmd_scanDetails = true;
+
+                for (Map.Entry<List<String>, Double> entry : matches.entrySet()) {
+                    assertArrayEquals(entry.getKey().toArray(), new String[]{"a", "b", "c", "d"});
+                    break;
+                }
+            }
+        });
+
+        Nlcmd.scan("a b c d y");
         assertTrue(_nlcmd_scanDetails);
     }
 }
