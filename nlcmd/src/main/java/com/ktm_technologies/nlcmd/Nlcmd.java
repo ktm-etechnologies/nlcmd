@@ -18,6 +18,7 @@ package com.ktm_technologies.nlcmd;
 
 import android.annotation.SuppressLint;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -71,7 +72,8 @@ public class Nlcmd {
 
     /**
      * @param order Order for markov chains, that is number of relevant previous steps when matching
-     * @throws IllegalStateException
+     * @throws IllegalStateException If actions have already been registered, it's not possible to
+     *                               use this method any more.
      */
     public static void setOrder(int order) throws IllegalStateException {
         if (_cs != null) {
@@ -92,11 +94,26 @@ public class Nlcmd {
     }
 
     /**
-     *
-     * @param phrases
-     * @param callback
+     * Register action with match phrases and hook
+     * @param phrases Training phrases to build a markov chain for this action
+     * @param callback Hook to run when the action is activated
      */
-    public static void action(String[] phrases, ActionLambda callback) {
+    public static void action(String[] phrases, MatchLambda callback) {
+
+        // Lazy instantiation to respec _order and _scoreMode
+        if (_cs == null) {
+            _cs = new CommandSet(_order, _scoreMode);
+        }
+
+        _cs.put(callback, phrases);
+    }
+
+    /**
+     * Register detailed action with match phrases and hook
+     * @param phrases Training phrases to build a markov chain for this action
+     * @param callback Hook to run when the action is activated
+     */
+    public static void action(String[] phrases, ScanLambda callback) {
 
         // Lazy instantiation to respec _order and _scoreMode
         if (_cs == null) {
@@ -120,9 +137,11 @@ public class Nlcmd {
         }
 
         Object object = _cs.match(phrase);
-        if (object instanceof ActionLambda) {
-            ActionLambda callback = (ActionLambda)object;
+        if (object instanceof MatchLambda) {
+            MatchLambda callback = (MatchLambda)object;
             callback.run();
+        } else {
+            throw new ClassCastException("Can only use ActionLambda with match(). See also ActionDetailsLambda.");
         }
     }
 
@@ -139,10 +158,14 @@ public class Nlcmd {
             return;
         }
 
-        Object object = _cs.match(phrase);
-        if (object instanceof ActionLambda) {
-            ActionLambda callback = (ActionLambda)object;
-            callback.run();
+        HashMap<List<String>, Double> matches = new HashMap<>();
+        HashMap<String, List<String>> placeholders = new HashMap<>();
+        Object object = _cs.scan(phrase, matches, placeholders);
+        if (object instanceof ScanLambda) {
+            ScanLambda callback = (ScanLambda)object;
+            callback.run(matches, placeholders);
+        } else {
+            throw new ClassCastException("Can only use ActionDetailsLambda with scan(). See also ActionLambda.");
         }
     }
 
