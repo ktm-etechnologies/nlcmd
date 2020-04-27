@@ -171,116 +171,126 @@ public class Nlcmd {
 
     /**
      * {@link android.util.Log#e}
+     * @param cls Class that's writing the entry
      * @param tag Log entry prefix
      * @param d Numeric value
      */
     @SuppressLint("DefaultLocale")
-    static void e(String tag, double d) {
+    static void e(Class cls, String tag, double d) {
         if (_level >= Nlcmd.LEVEL_ERROR) {
-            System.out.println(tag + ": " + String.format("%f", d));
+            System.out.println(cls.getSimpleName() + " " + tag + ": " + String.format("%f", d));
         }
     }
 
     /**
      * {@link android.util.Log#e}
+     * @param cls Class that's writing the entry
      * @param tag Log entry prefix
      * @param msg String value
      */
-    static void e(String tag, String msg) {
+    static void e(Class cls, String tag, String msg) {
         if (_level >= Nlcmd.LEVEL_ERROR) {
-            System.out.println(tag + ": " + msg);
+            System.out.println(cls.getSimpleName() + " " + tag + ": " + msg);
         }
     }
 
     /**
      * {@link android.util.Log#w}
+     * @param cls Class that's writing the entry
      * @param tag Log entry prefix
      * @param d Numeric value
      */
     @SuppressLint("DefaultLocale")
-    static void w(String tag, double d) {
+    static void w(Class cls, String tag, double d) {
         if (_level >= Nlcmd.LEVEL_WARNING) {
-            System.out.println(tag + ": " + String.format("%f", d));
+            System.out.println(cls.getSimpleName() + " " + tag + ": " + String.format("%f", d));
         }
     }
 
     /**
      * {@link android.util.Log#w}
+     * @param cls Class that's writing the entry
      * @param tag Log entry prefix
      * @param msg String value
      */
-    static void w(String tag, String msg) {
+    static void w(Class cls, String tag, String msg) {
         if (_level >= Nlcmd.LEVEL_WARNING) {
-            System.out.println(tag + ": " + msg);
+            System.out.println(cls.getSimpleName() + " " + tag + ": " + msg);
         }
     }
 
     /**
      * {@link android.util.Log#i}
+     * @param cls Class that's writing the entry
      * @param tag Log entry prefix
      * @param d Numeric value
      */
     @SuppressLint("DefaultLocale")
-    static void i(String tag, double d) {
+    static void i(Class cls, String tag, double d) {
         if (_level >= Nlcmd.LEVEL_INFO) {
-            System.out.println(tag + ": " + String.format("%f", d));
+            System.out.println(cls.getSimpleName() + " " + tag + ": " + String.format("%f", d));
         }
     }
 
     /**
      * {@link android.util.Log#i}
+     * @param cls Class that's writing the entry
      * @param tag Log entry prefix
      * @param msg String value
      */
-    static void i(String tag, String msg) {
+    static void i(Class cls, String tag, String msg) {
         if (_level >= Nlcmd.LEVEL_INFO) {
-            System.out.println(tag + ": " + msg);
+            System.out.println(cls.getSimpleName() + " " + tag + ": " + msg);
         }
     }
 
     /**
      * {@link android.util.Log#d}
+     * @param cls Class that's writing the entry
      * @param tag Log entry prefix
      * @param d Numeric value
      */
     @SuppressLint("DefaultLocale")
-    static void d(String tag, double d) {
+    static void d(Class cls, String tag, double d) {
         if (_level >= Nlcmd.LEVEL_DEBUG) {
-            System.out.println(tag + ": " + String.format("%f", d));
+            System.out.println(cls.getSimpleName() + " " + tag + ": " + String.format("%f", d));
         }
     }
 
     /**
      * {@link android.util.Log#d}
+     * @param cls Class that's writing the entry
      * @param tag Log entry prefix
      * @param msg String value
      */
-    static void d(String tag, String msg) {
+    static void d(Class cls, String tag, String msg) {
         if (_level >= Nlcmd.LEVEL_DEBUG) {
-            System.out.println(tag + ": " + msg);
+            System.out.println(cls.getSimpleName() + " " + tag + ": " + msg);
         }
     }
 
     /**
      * {@link android.util.Log#v}
+     * @param cls Class that's writing the entry
      * @param tag Log entry prefix
      * @param d Numeric value
      */
     @SuppressLint("DefaultLocale")
-    static void v(String tag, double d) {
+    static void v(Class cls, String tag, double d) {
         if (_level >= Nlcmd.LEVEL_VERBOSE) {
-            System.out.println(tag + ": " + String.format("%f", d));
+            System.out.println(cls.getSimpleName() + " " + tag + ": " + String.format("%f", d));
         }
     }
 
     /**
      * {@link android.util.Log#v}
+     * @param cls Class that's writing the entry
      * @param tag Log entry prefix
      * @param msg String value
      */
-    static void v(String tag, String msg) {
+    static void v(Class cls, String tag, String msg) {
         if (_level >= Nlcmd.LEVEL_VERBOSE) {
-            System.out.println(tag + ": " + msg);
+            System.out.println(cls.getSimpleName() + " " + tag + ": " + msg);
         }
     }
 }
