@@ -89,7 +89,7 @@ public class NlcmdTest {
             }
         });
 
-        Nlcmd.match(Arrays.asList("a b c d y".split(" ")));
+        Nlcmd.scan(Arrays.asList("a b c d y".split(" ")));
         org.junit.Assert.assertEquals(true, _nlcmd_scan);
     }
 }
