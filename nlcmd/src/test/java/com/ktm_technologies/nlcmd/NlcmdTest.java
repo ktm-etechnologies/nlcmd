@@ -16,16 +16,22 @@
 
 package com.ktm_technologies.nlcmd;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
 
 public class NlcmdTest {
 
     private boolean _nlcmd_match = false;
     private boolean _nlcmd_scan = false;
+    private boolean _nlcmd_scanDetails = false;
 
     @Test
     public void nlcmd_match() {
@@ -37,27 +43,25 @@ public class NlcmdTest {
         Nlcmd.action(new String[]{
                 "a b c",
                 "b c d",
-        }, new ActionLambda() {
+        }, new MatchLambda() {
             @Override
-            public boolean run() {
+            public void run() {
                 // Do nothing, we want to match the other action
-                return true;
             }
         });
 
         Nlcmd.action(new String[]{
                 "c d e",
                 "d e f",
-        }, new ActionLambda() {
+        }, new MatchLambda() {
             @Override
-            public boolean run() {
+            public void run() {
                 _nlcmd_match = true;
-                return true;
             }
         });
 
         Nlcmd.match(Arrays.asList("c d e".split(" ")));
-        org.junit.Assert.assertEquals(true, _nlcmd_match);
+        assertTrue(_nlcmd_match);
     }
 
     @Test
@@ -70,26 +74,62 @@ public class NlcmdTest {
         Nlcmd.action(new String[]{
                 "a b c d e",
                 "a x b x c x d x",
-        }, new ActionLambda() {
+        }, new ScanLambda() {
             @Override
-            public boolean run() {
+            public void run(HashMap<List<String>, Double> matches, HashMap<String, List<String>> placeholders) {
                 // Do nothing, we want to match the other action
-                return true;
             }
         });
 
         Nlcmd.action(new String[]{
                 "a b c d e",
                 "a b x d e",
-        }, new ActionLambda() {
+        }, new ScanLambda() {
             @Override
-            public boolean run() {
+            public void run(HashMap<List<String>, Double> matches, HashMap<String, List<String>> placeholders) {
                 _nlcmd_scan = true;
-                return true;
             }
         });
 
         Nlcmd.scan(Arrays.asList("a b c d y".split(" ")));
-        org.junit.Assert.assertEquals(true, _nlcmd_scan);
+        assertTrue(_nlcmd_scan);
+    }
+
+    @Test
+    public void nlcmd_scanDetails() {
+
+        // Reset only needed so we can run independent unit tests
+        Nlcmd.reset();
+        Nlcmd.setOrder(1);
+
+        Nlcmd.action(new String[]{
+                "a b c d e",
+                "a x b x c x d x",
+        }, new ScanLambda() {
+            @Override
+            public void run(HashMap<List<String>, Double> matches,
+                            HashMap<String, List<String>> placeholders) {
+                // Do nothing, we want to match the other action
+            }
+        });
+
+        Nlcmd.action(new String[]{
+                "a b c d e",
+                "a b x d e",
+        }, new ScanLambda() {
+            @Override
+            public void run(HashMap<List<String>, Double> matches,
+                            HashMap<String, List<String>> placeholders) {
+                _nlcmd_scanDetails = true;
+
+                for (Map.Entry<List<String>, Double> entry : matches.entrySet()) {
+                    assertArrayEquals(entry.getKey().toArray(), new String[]{"a", "b", "c", "d"});
+                    break;
+                }
+            }
+        });
+
+        Nlcmd.scan(Arrays.asList("a b c d y".split(" ")));
+        assertTrue(_nlcmd_scanDetails);
     }
 }

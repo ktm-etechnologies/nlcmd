@@ -19,11 +19,10 @@ package com.ktm_technologies.nlcmd;
 /**
  * Interface for action callbacks.
  */
-public interface ActionLambda {
+public interface MatchLambda {
 
     /**
      * Hook to run when a certain action should be dispatched.
-     * @return TRUE to terminate, FALSE if next ranked action should also be run
      */
-    boolean run();
+    void run();
 }
