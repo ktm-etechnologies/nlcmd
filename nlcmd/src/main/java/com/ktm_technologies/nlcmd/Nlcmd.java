@@ -20,6 +20,7 @@ import android.annotation.SuppressLint;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * This class provides static global command matching and execution callback with the #action()
@@ -102,7 +103,7 @@ public class Nlcmd {
 
         // Lazy instantiation to respec _order and _scoreMode
         if (_cs == null) {
-            _cs = new CommandSet(_order, _scoreMode);
+            _cs = new CommandSet(_order, _scoreMode, Locale.getDefault());
         }
 
         _cs.put(callback, phrases);
@@ -117,7 +118,7 @@ public class Nlcmd {
 
         // Lazy instantiation to respec _order and _scoreMode
         if (_cs == null) {
-            _cs = new CommandSet(_order, _scoreMode);
+            _cs = new CommandSet(_order, _scoreMode, Locale.getDefault());
         }
 
         _cs.put(callback, phrases);
@@ -131,7 +132,7 @@ public class Nlcmd {
      */
     public static void match(String phrase) {
 
-        List<String> list = Utils.words(phrase);
+        List<String> list = Utils.words(phrase, Locale.getDefault());
         match(list);
     }
 
@@ -165,7 +166,7 @@ public class Nlcmd {
      */
     public static void scan(String phrase) {
 
-        List<String> list = Utils.words(phrase);
+        List<String> list = Utils.words(phrase, Locale.getDefault());
         scan(list);
     }
 

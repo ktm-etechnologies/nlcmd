@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 
 import static com.ktm_technologies.nlcmd.Nlcmd.d;
 import static com.ktm_technologies.nlcmd.Nlcmd.v;
@@ -34,8 +35,9 @@ import static com.ktm_technologies.nlcmd.Nlcmd.v;
 @SuppressWarnings("WeakerAccess")
 public class CommandSet extends HashMap<Object, MarkovChain> {
 
-    private ScoreMode _scoreMode;
-    private int _order;
+    private ScoreMode   _scoreMode;
+    private int         _order;
+    private Locale      _locale;
 
     /**
      * Create CommandSet object
@@ -43,15 +45,17 @@ public class CommandSet extends HashMap<Object, MarkovChain> {
      * @param order Order for markov chains created via the {@link CommandSet#put(Object, String[])}
      *              method, that is number of relevant previous steps when matching
      * @param scoreMode See {@link ScoreMode}
+     * @param locale Language settings
      * @throws IndexOutOfBoundsException If order < 1
      */
-    public CommandSet(int order, ScoreMode scoreMode) {
+    public CommandSet(int order, ScoreMode scoreMode, Locale locale) {
 
         if (order < 1) {
             throw new IndexOutOfBoundsException("MarkovChain order size can not be < 1");
         }
         _order = order;
         _scoreMode = scoreMode;
+        _locale = locale;
     }
 
     /**
@@ -72,7 +76,7 @@ public class CommandSet extends HashMap<Object, MarkovChain> {
 
         MarkovChain mc = createChain();
         for (String command : commands) {
-            List<String> phrase = Utils.words(command);
+            List<String> phrase = Utils.words(command, _locale);
             mc.train(phrase);
         }
         this.put(key, mc);

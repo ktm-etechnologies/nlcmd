@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -48,7 +49,7 @@ public class CommandSetTest {
             "navigate to <location>",
             "load route to <location>"
         };
-        CommandSet cs = new CommandSet(_ORDER, ScoreMode.HIGHEST_AVG);
+        CommandSet cs = new CommandSet(_ORDER, ScoreMode.HIGHEST_AVG, Locale.getDefault());
         cs.put("destination", commands);
 
         List<String> phrase = Arrays.asList("load route to Munderfing".split(" "));
@@ -65,7 +66,7 @@ public class CommandSetTest {
     @Test
     public void command_matchNavigation() {
 
-        CommandSet cs = new CommandSet(_ORDER, ScoreMode.HIGHEST_AVG);
+        CommandSet cs = new CommandSet(_ORDER, ScoreMode.HIGHEST_AVG, Locale.getDefault());
         cs.put("destination", createDestinationChainW2());
         cs.put("waypoint", createWaypointChainW2());
         cs.put("skip", createSkipWaypointChainW2());
@@ -77,7 +78,7 @@ public class CommandSetTest {
     @Test
     public void command_scanNavigation() {
 
-        CommandSet cs = new CommandSet(_ORDER, ScoreMode.HIGHEST_AVG);
+        CommandSet cs = new CommandSet(_ORDER, ScoreMode.HIGHEST_AVG, Locale.getDefault());
         cs.put("destination", createDestinationChainW2());
         cs.put("waypoint", createWaypointChainW2());
         cs.put("skip", createSkipWaypointChainW2());
@@ -96,7 +97,7 @@ public class CommandSetTest {
     @Test
     public void command_highestAverage() {
 
-        CommandSet cs = new CommandSet(1, ScoreMode.HIGHEST_AVG);
+        CommandSet cs = new CommandSet(1, ScoreMode.HIGHEST_AVG, Locale.getDefault());
         String[] model1 = {
                 "a b c d e f",
                 "a x b x c x d x e x"
@@ -116,7 +117,7 @@ public class CommandSetTest {
     @Test
     public void command_longestMatchW1() throws Exception {
 
-        CommandSet cs = new CommandSet(1, ScoreMode.LONGEST_AVG_REL);
+        CommandSet cs = new CommandSet(1, ScoreMode.LONGEST_AVG_REL, Locale.getDefault());
         String[] phrases1 = {
                 "a b c d e f",
                 "a x b x c x d x e x"

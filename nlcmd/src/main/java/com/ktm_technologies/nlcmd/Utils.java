@@ -21,6 +21,7 @@ import android.os.CpuUsageInfo;
 import java.text.BreakIterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Internal static utilities container.
@@ -35,11 +36,12 @@ class Utils {
     /**
      * Split string into words.
      * @param phrase Input string for splitting up
+     * @param locale Language settings
      * @return Linked list of words
      */
-    static List<String> words(String phrase) {
+    static List<String> words(String phrase, Locale locale) {
 
-        BreakIterator iter = BreakIterator.getWordInstance();
+        BreakIterator iter = BreakIterator.getWordInstance(locale);
         iter.setText(phrase);
         List<String> l = new LinkedList<>();
         int start = iter.first();
