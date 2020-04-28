@@ -40,7 +40,7 @@ public class CommandSet extends HashMap<Object, MarkovChain> {
     /**
      * Create CommandSet object
      *
-     * @param order Order for markov chains created via the {@link CommandSet#put(String, String[])}
+     * @param order Order for markov chains created via the {@link CommandSet#put(Object, String[])}
      *              method, that is number of relevant previous steps when matching
      * @param scoreMode See {@link ScoreMode}
      * @throws IndexOutOfBoundsException If order < 1
@@ -102,7 +102,7 @@ public class CommandSet extends HashMap<Object, MarkovChain> {
             }
         }
 
-        d("CommandSet.match", maxAvgProbability);
+        d(this.getClass(), ".match()", maxAvgProbability);
 
         return key;
     }
@@ -145,7 +145,7 @@ public class CommandSet extends HashMap<Object, MarkovChain> {
             }
         }
 
-        d("CommandSet.match", maxAvgProbability);
+        d(this.getClass(), ".match()", maxAvgProbability);
 
         return key;
     }
@@ -197,7 +197,7 @@ public class CommandSet extends HashMap<Object, MarkovChain> {
             _phraseLen = phrase.size();
             int id = super.initQuery(phrase);
 
-            v(this.getClass().getName() + ".initQuery() _phraseLen", _phraseLen);
+            v(this.getClass(), ".initQuery() _phraseLen", _phraseLen);
 
             // Extend lists
             _sumSubmatchP.add(0.0);
