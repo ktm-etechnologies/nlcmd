@@ -19,16 +19,19 @@ package com.ktm_technologies.nlcmd;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Locale;
 
 import static org.junit.Assert.*;
 
 public class UtilsTest {
 
+    private Locale _locale = Locale.getDefault();
+
     @Test
     public void nlcmd_Util_words1() {
 
         String phrase = "a b, c";
-        List<String> words = Utils.words(phrase);
+        List<String> words = Utils.words(phrase, _locale);
         assertEquals(3, words.size());
     }
 
@@ -36,7 +39,7 @@ public class UtilsTest {
     public void nlcmd_Util_words2() {
 
         String phrase = "";
-        List<String> words = Utils.words(phrase);
+        List<String> words = Utils.words(phrase, _locale);
         assertEquals(0, words.size());
     }
 
@@ -44,7 +47,7 @@ public class UtilsTest {
     public void nlcmd_Util_words3() {
 
         String phrase = " ";
-        List<String> words = Utils.words(phrase);
+        List<String> words = Utils.words(phrase, _locale);
         assertEquals(0, words.size());
     }
 
@@ -52,7 +55,47 @@ public class UtilsTest {
     public void nlcmd_Util_words4() {
 
         String phrase = " a";
-        List<String> words = Utils.words(phrase);
+        List<String> words = Utils.words(phrase, _locale);
         assertEquals(1, words.size());
+    }
+
+    @Test
+    public void nlcmd_Util_words5() {
+
+        String phrase = "<a> b c";
+        List<String> words = Utils.words(phrase, _locale);
+        assertEquals(3, words.size());
+    }
+
+    @Test
+    public void nlcmd_Util_words51() {
+
+        String phrase = " <a> b c";
+        List<String> words = Utils.words(phrase, _locale);
+        assertEquals(3, words.size());
+    }
+
+    @Test
+    public void nlcmd_Util_words6() {
+
+        String phrase = "a <b> c";
+        List<String> words = Utils.words(phrase, _locale);
+        assertEquals(3, words.size());
+    }
+
+    @Test
+    public void nlcmd_Util_words7() {
+
+        String phrase = "a b <c>";
+        List<String> words = Utils.words(phrase, _locale);
+        assertEquals(3, words.size());
+    }
+
+    @Test
+    public void nlcmd_Util_words8() {
+
+        String phrase = "a b <c> ";
+        List<String> words = Utils.words(phrase, _locale);
+        assertEquals(3, words.size());
     }
 }
