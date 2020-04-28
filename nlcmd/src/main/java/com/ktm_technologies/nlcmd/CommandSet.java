@@ -72,7 +72,7 @@ public class CommandSet extends HashMap<Object, MarkovChain> {
 
         MarkovChain mc = createChain();
         for (String command : commands) {
-            List<String> phrase = Arrays.asList(command.split(" "));
+            List<String> phrase = Utils.words(command);
             mc.train(phrase);
         }
         this.put(key, mc);

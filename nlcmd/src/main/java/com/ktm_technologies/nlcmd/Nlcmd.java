@@ -127,6 +127,18 @@ public class Nlcmd {
      * Match input phrase against actions and run the best fitting one.
      * The #match() method only considers full lengths input phrase covering models.
      * @param phrase Input phrase
+     * @see Nlcmd#scan(String) for sub-phrase matching
+     */
+    public static void match(String phrase) {
+
+        List<String> list = Utils.words(phrase);
+        match(list);
+    }
+
+    /**
+     * Match input phrase against actions and run the best fitting one.
+     * The #match() method only considers full lengths input phrase covering models.
+     * @param phrase Input phrase
      * @see Nlcmd#scan(List) for sub-phrase matching
      */
     public static void match(List<String> phrase) {
@@ -143,6 +155,18 @@ public class Nlcmd {
         } else {
             throw new ClassCastException("Can only use ActionLambda with match(). See also ActionDetailsLambda.");
         }
+    }
+
+    /**
+     * Match input phrase against actions and run the best fitting one.
+     * The #scan() method
+     * @param phrase Input phrase
+     * @see Nlcmd#match(String) for strict full-phrase matching only
+     */
+    public static void scan(String phrase) {
+
+        List<String> list = Utils.words(phrase);
+        scan(list);
     }
 
     /**
