@@ -35,6 +35,10 @@ public class NlcmdTest {
     private boolean _nlcmd_scan = false;
     private boolean _nlcmd_scanDetails = false;
 
+    private boolean _nlcmd_scanTriple1 = false;
+    private boolean _nlcmd_scanTriple2 = false;
+    private boolean _nlcmd_scanTriple3 = false;
+
     @Test
     public void nlcmd_match() {
 
@@ -212,5 +216,54 @@ public class NlcmdTest {
 
         Nlcmd.scan("a b c d y");
         assertTrue(_nlcmd_scanDetails);
+    }
+
+    @Test
+    public void nlcmd_scanTriple() {
+
+        _nlcmd_scanTriple1 = false;
+        _nlcmd_scanTriple2 = false;
+        _nlcmd_scanTriple3 = false;
+        Nlcmd.reset();
+
+        Nlcmd.action(new String[]{"hallo und willkommen"},
+            new ScanLambda() {
+                @Override
+                public void run(HashMap<List<String>, Double> matches, HashMap<String, List<String>> placeholders) {
+                    _nlcmd_scanTriple1 = true;
+                }
+        });
+        Nlcmd.action(new String[]{"was ist hier los"},
+            new ScanLambda() {
+                @Override
+                public void run(HashMap<List<String>, Double> matches, HashMap<String, List<String>> placeholders) {
+                    _nlcmd_scanTriple2 = true;
+                }
+        });
+        Nlcmd.action(new String[]{"das ist ein test"},
+            new ScanLambda() {
+                @Override
+                public void run(HashMap<List<String>, Double> matches, HashMap<String, List<String>> placeholders) {
+                    _nlcmd_scanTriple3 = true;
+                }
+        });
+
+        Nlcmd.scan("hallo und willkommen");
+        assertTrue(_nlcmd_scanTriple1);
+        assertFalse(_nlcmd_scanTriple2);
+        assertFalse(_nlcmd_scanTriple3);
+        _nlcmd_scanTriple1 = false;
+
+        Nlcmd.scan("was ist hier los");
+        assertFalse(_nlcmd_scanTriple1);
+        assertTrue(_nlcmd_scanTriple2);
+        assertFalse(_nlcmd_scanTriple3);
+        _nlcmd_scanTriple2 = false;
+
+        Nlcmd.scan("das ist ein test");
+        assertFalse(_nlcmd_scanTriple1);
+        assertFalse(_nlcmd_scanTriple2);
+        assertTrue(_nlcmd_scanTriple3);
+        _nlcmd_scanTriple3 = false;
     }
 }
