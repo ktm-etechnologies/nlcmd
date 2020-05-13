@@ -18,11 +18,8 @@ package com.ktm_technologies.nlcmd;
 
 import android.annotation.SuppressLint;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 
 import static com.ktm_technologies.nlcmd.Nlcmd.d;
@@ -79,6 +76,8 @@ public class CommandSet extends HashMap<Object, MarkovChain> {
             List<String> phrase = Utils.words(command, _locale);
             mc.train(phrase);
         }
+
+        Nlcmd.v(this.getClass(), "put()", key + " : " + mc);
         this.put(key, mc);
     }
 
@@ -99,7 +98,7 @@ public class CommandSet extends HashMap<Object, MarkovChain> {
 
             MarkovChain mc = entry.getValue();
             avgProbability = mc.match(phrase);
-            avgProbability = extractScore(mc, avgProbability);
+            avgProbability = scoreAndClear(mc, avgProbability);
             if (avgProbability > maxAvgProbability) {
                 maxAvgProbability = avgProbability;
                 key = entry.getKey();
@@ -132,7 +131,7 @@ public class CommandSet extends HashMap<Object, MarkovChain> {
             HashMap<String, List<String>> placeholders_ = new HashMap<>();
             MarkovChain mc = entry.getValue();
             double avgProbability = mc.scan(phrase, matches_, placeholders_);
-            avgProbability = extractScore(mc, avgProbability);
+            avgProbability = scoreAndClear(mc, avgProbability);
             if (avgProbability > maxAvgProbability) {
                 maxAvgProbability = avgProbability;
                 key = entry.getKey();
@@ -171,13 +170,15 @@ public class CommandSet extends HashMap<Object, MarkovChain> {
         return mc;
     }
 
-    private double extractScore(MarkovChain mc, double defaultScore) throws RuntimeException {
+    private double scoreAndClear(MarkovChain mc, double defaultScore) throws RuntimeException {
 
         if (_scoreMode == ScoreMode.HIGHEST_AVG) {
             return defaultScore;
         } else if (_scoreMode == ScoreMode.LONGEST_AVG_REL) {
             Mixin mixin = mc.getMixin() instanceof Mixin ? (Mixin)mc.getMixin() : null;
-            return mixin.getScore();
+            double score = mixin.getScore();
+            mixin.clear();
+            return score;
         } else if (_scoreMode == ScoreMode.LONGEST_AVG_REL_MOR) {
             throw new RuntimeException("Not implemented");
         } else {
@@ -190,10 +191,8 @@ public class CommandSet extends HashMap<Object, MarkovChain> {
      */
     class Mixin extends MarkovChainMixin {
 
-        private int             _phraseLen;
-        // TODO implement parallel matches per id
-        private List<Double>    _sumSubmatchP = new LinkedList<>();
-        private List<Integer>   _nSubmatchEdges = new LinkedList<>();
+        private int                             _phraseLen;
+        private HashMap<Integer, Accumulator>   _accumulators = new HashMap<>();
 
         @Override
         int initQuery(List<String> phrase) {
@@ -203,9 +202,7 @@ public class CommandSet extends HashMap<Object, MarkovChain> {
 
             v(this.getClass(), ".initQuery() _phraseLen", _phraseLen);
 
-            // Extend lists
-            _sumSubmatchP.add(0.0);
-            _nSubmatchEdges.add(0);
+            _accumulators.put(id, new Accumulator());
 
             return id;
         }
@@ -213,46 +210,61 @@ public class CommandSet extends HashMap<Object, MarkovChain> {
         @Override
         void updateQuery(int id, Node node, Edge edge) {
 
-            // Update lists
-            int length = _sumSubmatchP.size();
-            double avgP = _sumSubmatchP.get(length - 1);
-            avgP += edge.getProbability();
-            _sumSubmatchP.remove(length - 1);
-            _sumSubmatchP.add(avgP);
-
-            length = _nSubmatchEdges.size();
-            int nEdges = _nSubmatchEdges.get(length - 1);
-            nEdges++;
-            _nSubmatchEdges.remove(length - 1);
-            _nSubmatchEdges.add(nEdges);
+            Accumulator accumulator = _accumulators.get(id);
+            accumulator.add(edge.getProbability());
         }
 
         @Override
         void finishQuery(int id, boolean success) {
+
+            if (!success) {
+                _accumulators.remove(id);
+            }
         }
 
         double getScore() {
 
             // Find longest sub-match
-            int maxIndex = -1;
-            int maxLen = 0;
-            ListIterator<Integer> iter = _nSubmatchEdges.listIterator();
-            while (iter.hasNext()) {
-                int index = iter.nextIndex();
-                int len = iter.next();
-                if (len > maxLen) {
-                    maxLen = len;
-                    maxIndex = index;
+            int maxLength = 0;
+            Accumulator longest = null;
+            for (Entry<Integer, Accumulator> entry : _accumulators.entrySet()) {
+                if (entry.getValue().getLength() > maxLength) {
+                    longest = entry.getValue();
+                    maxLength = entry.getValue().getLength();
                 }
             }
 
-
-            if (maxIndex > -1) {
-                double avgSubmatchP = _sumSubmatchP.get(maxIndex) / _phraseLen;
-                return avgSubmatchP;
+            if (longest != null) {
+                return longest.getProbability() * longest.getLength() / _phraseLen;
             }
 
             return 0;
+        }
+
+        void clear() {
+            _phraseLen = 0;
+            _accumulators.clear();
+        }
+    }
+
+    class Accumulator {
+
+        private int     _length;
+        private double  _avgP;
+
+        void add(double p) {
+            double sum = _avgP * _length;
+            sum += p;
+            _length++;
+            _avgP = sum / _length;
+        }
+
+        int getLength() {
+            return _length;
+        }
+
+        double getProbability() {
+            return _avgP;
         }
     }
 }
