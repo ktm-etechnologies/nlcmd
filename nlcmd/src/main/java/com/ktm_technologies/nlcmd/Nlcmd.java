@@ -153,7 +153,7 @@ public class Nlcmd {
         if (object instanceof MatchLambda) {
             MatchLambda callback = (MatchLambda)object;
             callback.run();
-        } else {
+        } else if (object != null) {
             throw new ClassCastException("Can only use ActionLambda with match(). See also ActionDetailsLambda.");
         }
     }
@@ -189,7 +189,7 @@ public class Nlcmd {
         if (object instanceof ScanLambda) {
             ScanLambda callback = (ScanLambda)object;
             callback.run(matches, placeholders);
-        } else {
+        } else if (object != null) {
             throw new ClassCastException("Can only use ActionDetailsLambda with scan(). See also ActionLambda.");
         }
     }
