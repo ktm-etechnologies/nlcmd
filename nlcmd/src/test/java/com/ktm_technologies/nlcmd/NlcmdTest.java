@@ -32,7 +32,9 @@ import static org.junit.Assert.assertArrayEquals;
 public class NlcmdTest {
 
     private boolean _nlcmd_match = false;
+    private boolean _nlcmd_matchNull = false;
     private boolean _nlcmd_scan = false;
+    private boolean _nlcmd_scanNull = false;
     private boolean _nlcmd_scanDetails = false;
 
     private boolean _nlcmd_scanTriple1 = false;
@@ -70,6 +72,26 @@ public class NlcmdTest {
 
         Nlcmd.match(Arrays.asList("c d e".split(" ")));
         assertTrue(_nlcmd_match);
+    }
+
+    @Test
+    public void nlcmd_matchNull() {
+
+        // Reset only needed so we can run independent unit tests
+        Nlcmd.reset();
+        Nlcmd.setOrder(1);
+
+        Nlcmd.action(new String[]{
+                "a b c"
+        }, new MatchLambda() {
+            @Override
+            public void run() {
+                _nlcmd_matchNull = true;
+            }
+        });
+
+        Nlcmd.match(Arrays.asList("x y z".split(" ")));
+        assertFalse(_nlcmd_matchNull);
     }
 
     @Test
@@ -136,6 +158,27 @@ public class NlcmdTest {
 
         Nlcmd.scan(Arrays.asList("a b c d y".split(" ")));
         assertTrue(_nlcmd_scan);
+    }
+
+    @Test
+    public void nlcmd_scanNull() {
+
+        // Reset only needed so we can run independent unit tests
+        Nlcmd.reset();
+        Nlcmd.setOrder(1);
+
+        Nlcmd.action(new String[]{
+                "a b c"
+        }, new ScanLambda() {
+            @Override
+            public void run(HashMap<List<String>, Double> matches,
+                            HashMap<String, List<String>> placeholders) {
+                _nlcmd_scanNull = true;
+            }
+        });
+
+        Nlcmd.match(Arrays.asList("x y z".split(" ")));
+        assertFalse(_nlcmd_scanNull);
     }
 
     @Test

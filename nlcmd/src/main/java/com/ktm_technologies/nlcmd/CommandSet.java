@@ -91,7 +91,7 @@ public class CommandSet extends HashMap<Object, MarkovChain> {
     @SuppressLint("DefaultLocale")
     public Object match(List<String> phrase) {
 
-        double maxAvgProbability = -1;
+        double maxAvgProbability = 0.0;
         Object key = null;
         double avgProbability;
         for (Entry<Object, MarkovChain> entry : this.entrySet()) {
@@ -123,7 +123,7 @@ public class CommandSet extends HashMap<Object, MarkovChain> {
                        HashMap<List<String>, Double>    matches,
                        HashMap<String, List<String>>    placeholders) {
 
-        double maxAvgProbability = -1;
+        double maxAvgProbability = 0.0;
         Object key = null;
         for (Entry<Object, MarkovChain> entry : this.entrySet()) {
 
