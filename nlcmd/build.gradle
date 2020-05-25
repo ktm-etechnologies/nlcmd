@@ -46,7 +46,7 @@ publishing {
     }
 
     def getVersionName = { ->
-        return "0.4.4"
+        return "0.6.0"
     }
 
     def getArtifactId = { ->
