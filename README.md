@@ -16,7 +16,10 @@ Features include
   of models for visualization and debugging
 
 The code is in proof-of-concept stage and feedback is welcome. 
-* Github page: https://github.com/ktm-technologies/nlcmd/
-* API reference: https://ktm-technologies.github.io/nlcmd/doc/
+* Maven repo: <a href="https://github.com/ktm-technologies/nlcmd/packages/178866">https://github.com/ktm-technologies/nlcmd/packages/178866</a>
+* Github page: <a href="https://github.com/ktm-technologies/nlcmd/">https://github.com/ktm-technologies/nlcmd/</a>
+* API reference: <a href="https://ktm-technologies.github.io/nlcmd/doc/">https://ktm-technologies.github.io/nlcmd/doc/</a>
+* Releases: <a href="https://ktm-technologies.github.io/nlcmd.html">https://ktm-technologies.github.io/nlcmd.html</a>
+* Example app: <a href="https://github.com/ktm-technologies/nlcmd-android-examples">https://github.com/ktm-technologies/nlcmd-android-examples</a>
 
 Proudly supported by [KTM Technologies](https://ktm-technologies.com)
